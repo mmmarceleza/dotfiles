@@ -14,17 +14,17 @@
   pl   = !git pull origin main
   d    = diff
 [core]
-	editor = vim
+  editor = vim
   pager = delta
 [delta]
-    navigate = true    # use n and N to move between diff sections
-    light = false      # set to true if you're in a terminal w/ a light background color (e.g. the default macOS terminal)
+  navigate = true    # use n and N to move between diff sections
+  light = false      # set to true if you're in a terminal w/ a light background color (e.g. the default macOS terminal)
 [diff]
-    colorMoved = default
+  colorMoved = default
 [interactive]
-    diffFilter = delta --color-only
+  diffFilter = delta --color-only
 [merge]
-    conflictstyle = diff3
+  conflictstyle = diff3
 [user]
-	email = 58913502+mmmarceleza@users.noreply.github.com
-	name = mmmarceleza
+  email = 58913502+mmmarceleza@users.noreply.github.com
+  name = mmmarceleza
