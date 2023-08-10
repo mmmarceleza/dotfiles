@@ -1,0 +1,16 @@
+# Load a kubeconfig file of a Kubernetes cluster
+
+kcfg () 
+{ 
+    if [ $# -eq 0 ]; then
+        unset KUBECONFIG;
+        return;
+    fi;
+    if ! [ -e "$1" ]; then
+        echo Creating kubeconfig: $1;
+        touch $1;
+    fi;
+    export KUBECONFIG="$(realpath $1)";
+    echo Using kubeconfig: $KUBECONFIG;
+    chmod 700 $KUBECONFIG
+}
