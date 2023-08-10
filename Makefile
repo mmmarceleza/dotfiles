@@ -8,7 +8,7 @@ konsole:
 	stow -vt ~ konsole
 
 .PHONY: nvim
-konsole:
+nvim:
 	stow -vt ~ nvim
 
 .PHONY: stow
