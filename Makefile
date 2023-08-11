@@ -17,9 +17,8 @@ nvim:
 nvim-unstow:
 	stow -vDt ~ nvim
 
-LINE1 = '[ -f ~/.shell_aliases ] && . ~/.shell_aliases'
-LINE2 = '[ -f ~/.shell_functions ] && . ~/.shell_functions'
-
+zshrc: LINE1 = '[ -f ~/.shell_aliases ] && . ~/.shell_aliases'
+zshrc: LINE2 = '[ -f ~/.shell_functions ] && . ~/.shell_functions'
 zshrc:
 	@stow -vt ~ zsh
 	@if grep -q $(LINE1) ~/.zshrc; then
