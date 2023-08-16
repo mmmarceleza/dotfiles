@@ -1,3 +1,5 @@
+export EDITOR=vim
+
 # Others
 alias g='git'
 alias git-show-alias='cat $HOME/.gitconfig'
