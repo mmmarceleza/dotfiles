@@ -9,4 +9,5 @@ Name=marcelo-zsh
 Parent=FALLBACK/
 
 [Scrolling]
-HistoryMode=2
+HistoryMode=1
+HistorySize=10000
