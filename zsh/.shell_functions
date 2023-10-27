@@ -19,7 +19,15 @@ kcfg ()
 
 jwtd() {
     if [[ -x $(command -v jq) ]]; then
-         jq -R 'split(".") | .[0],.[1] | @base64d | fromjson' <<< "${1}"
-         echo "Signature: $(echo "${1}" | awk -F'.' '{print $3}')"
+         JWT=$(jq -R 'split(".") | .[0],.[1] | @base64d | fromjson' <<< "${1}")
+         echo $JWT
+         EXPIRATION_DATE=$(jq .exp//empty <<<$JWT)
+
+        if [[ -z "$EXPIRATION_DATE" ]]; then
+           echo "There is no experation date for this token"
+        else
+         echo "Token expiration date:"
+         date -d @$EXPIRATION_DATE
+        fi
     fi
 }
