@@ -36,13 +36,26 @@ jwtd() {
 
 get_certificate() {
   local domain="$1"
-  
+  local port="${2:-443}"  # Use port 443 by default if the second argument is not provided
+
   if [ -z "$domain" ]; then
-    echo "Usage: get_certificate <domain>"
+    echo "Usage: get_certificate <domain> [port]"
     return 1
   fi
 
-  # Use openssl to retrieve and print the certificate in text format
-  openssl s_client -connect "${domain}:443" -servername "${domain}" < /dev/null 2>/dev/null | openssl x509 -text -noout
+  # Print certificate
+  echo "#---------------------------------------------------------------"
+  echo "#-------------------------CERTIFICATE---------------------------"
+  echo "#---------------------------------------------------------------"
+  openssl s_client -connect "${domain}:${port}" -servername "${domain}" < /dev/null 2>/dev/null | openssl x509 -text | sed -n '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/p'
+
+  # Print certificate in text format
+
+  echo "#---------------------------------------------------------------"
+  echo "#------------------CERTIFICATE IN TEXT FORMAT-------------------"
+  echo "#---------------------------------------------------------------"
+  openssl s_client -connect "${domain}:${port}" -servername "${domain}" < /dev/null 2>/dev/null | openssl x509 -text -noout
 }
+
+
 
