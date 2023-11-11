@@ -2,7 +2,8 @@ git clone --bare https://github.com/mmmarceleza/dotfiles.git $HOME/.dotfiles
 function config {
    /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@
 }
-mkdir -p .config-backup
+mkdir -p $HOME/.config-backup
+cd $HOME
 config checkout
 if [ $? = 0 ]; then
   echo "Checked out config.";

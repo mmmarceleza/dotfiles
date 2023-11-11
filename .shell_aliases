@@ -1,10 +1,8 @@
-export EDITOR=vim
-. <(flux completion zsh)
-
 # Others
 alias g='git'
 alias git-show-alias='cat $HOME/.gitconfig'
 alias l='ls -lah'
+alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # Docker
 alias redis-cli='docker run --rm --network=host redis:alpine redis-cli'
