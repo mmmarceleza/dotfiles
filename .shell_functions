@@ -58,4 +58,44 @@ get_certificate() {
 }
 
 
+##
+## kubectl port-forward on selected services, combined by all service ports.
+##
+function kpfz()
+{
+    local svcs=$(
+        FZF_DEFAULT_COMMAND="command kubectl get svc -o json $_NS | svc-ports" \
+            fzf -m --ansi --no-preview -1 --exact --select-1 --query="$@"
+    )
+
+    if [ -z "$svcs" ]; then
+        return
+    fi
+
+    pids=()
+    for svc in $svcs; do
+        local port=${svc##*:}
+        local lport=$port
+        local name=${svc%%:*}
+        if [ $lport -lt 1024 ]; then
+            lport=$((lport + 1024))
+        fi
+        local cmd="kubectl port-forward svc/$name $lport:$port $@"
+        command $cmd & pids+=($!)
+    done
+    trap "echo Killing pids: ${pids[*]}; kill -INT ${pids[*]}" SIGINT SIGTERM SIGHUP EXIT
+    wait
+    trap - SIGINT SIGTERM SIGHUP EXIT
+    sleep 1 # give a chance to prompt appear
+}
+
+##
+## Same as kpfz, but for a specifc namespace
+##
+function kpfzn()
+{
+    local ns="$1"
+    shift
+    _NS="-n $ns" kpfz "$@"
+}
 
