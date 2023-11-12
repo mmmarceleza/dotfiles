@@ -20,3 +20,10 @@ Execute the following command:
 ```
 curl -Lks https://raw.githubusercontent.com/mmmarceleza/dotfiles/main/.bin/install.sh | /bin/bash 
 ```
+
+---
+
+# References
+
+- [Git Bare Repository - A Better Way To Manage Dotfiles](https://youtu.be/tBoLDpTWVOM)
+- [Dotfiles: Best way to store in a bare git repository](https://www.atlassian.com/git/tutorials/dotfiles)
