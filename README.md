@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/mmmarceleza/dotfiles/assets/58913502/33a66208-1d8d-4907-b11b-c68a0b9ad862" alt="dotfiles"/>
+  <img src="https://github.com/mmmarceleza/dotfiles/assets/58913502/f0033709-a970-4eb8-a124-389b69129bd5" alt="dotfiles"/>
 </p>
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
