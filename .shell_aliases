@@ -1,7 +1,27 @@
 # Others
 alias g='git'
 alias git-show-alias='cat $HOME/.gitconfig'
-alias l='ls -lah'
+
+# cat customization
+[ $(command -v bat) ] && alias cat='bat --decorations=never'
+
+# ls customization
+if [ $(command -v lsd) ]; then
+  alias ls='lsd'
+  alias ls='lsd --group-dirs first'
+  alias l='ls -lah'
+else
+  alias ls='ls --color=auto --group-directories-first'
+  alias l='ls -lahv'
+fi
+
+# find customization
+if [ $(command -v fd) ]; then
+  alias fdz='fd --type f --hidden --exclude .git | fzf | xargs nvim'
+else
+  alias fdz='find . -type f -not -path './.git*' | fzf | xargs nvim'
+fi
+
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # Docker
