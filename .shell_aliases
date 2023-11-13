@@ -5,6 +5,12 @@ alias git-show-alias='cat $HOME/.gitconfig'
 # cat customization
 [ $(command -v bat) ] && alias cat='bat --decorations=never'
 
+# cd customization
+alias c1='cd ..'
+alias c2='cd ../..'
+alias c3='cd ../../..'
+alias c4='cd ../../../..'
+
 # ls customization
 if [ $(command -v lsd) ]; then
   alias ls='lsd'
@@ -15,11 +21,14 @@ else
   alias l='ls -lahv'
 fi
 
-# find customization
+# grep customization
+alias grep='grep --color=auto'
+
+# find files customization
 if [ $(command -v fd) ]; then
-  alias fdz='fd --type f --hidden --exclude .git | fzf | xargs nvim'
+  alias ffz='fd --type f --hidden --exclude .git | fzf | xargs nvim'
 else
-  alias fdz='find . -type f -not -path './.git*' | fzf | xargs nvim'
+  alias ffz='find . -type f -not -path './.git*' | fzf | xargs nvim'
 fi
 
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
