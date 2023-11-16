@@ -22,3 +22,6 @@ vim.wo.number = true
 -- disable netrw to use nvim-tree
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+
+-- allows neovim to access the system clipboard
+vim.opt.clipboard = "unnamedplus"

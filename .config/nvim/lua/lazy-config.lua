@@ -20,4 +20,5 @@ require("lazy").setup({
   {'nvim-lualine/lualine.nvim', dependencies = 'nvim-tree/nvim-web-devicons'}, -- https://github.com/nvim-lualine/lualine.nvim
   {'nvim-telescope/telescope.nvim', tag = '0.1.4', dependencies = { 'nvim-lua/plenary.nvim' }} -- https://github.com/nvim-telescope/telescope.nvim
     -- BurntSushi/ripgrep is required for live_grep and grep_string and is the first priority for find_files.
+    -- arch instalation: pacman -S ripgrep
 })

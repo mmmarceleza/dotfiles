@@ -8,6 +8,10 @@
 
 export HISTFILESIZE=999999
 export HISTSIZE=999999
+# Don't record some commands
+# export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
+# A colon-separated list of values controlling how commands are saved on the history list
+# HISTCONTROL="erasedups:ignoreboth"
 
 # Set default editor to nvim if available, otherwise vim
 export EDITOR=${EDITOR:-$(which nvim || which vim || which vi)} 2>/dev/null
