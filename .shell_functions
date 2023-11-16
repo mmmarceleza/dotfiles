@@ -61,13 +61,13 @@ get_certificate() {
 if [ $(command -v fd) ]; then
   fdz() {
     local dir
-    dir=$(fd -t d . 2>/dev/null | fzf +m) || return
+    dir=$(fd -t d --hidden . 2>/dev/null | fzf +m) || return
     cd "$dir" || return
   }
 else
   fdz() {
     local dir
-    dir=$(find * -type d 2>/dev/null | fzf +m) || return
+    dir=$(find . -type d 2>/dev/null | fzf +m) || return
     cd "$dir" || return
   }
 fi
