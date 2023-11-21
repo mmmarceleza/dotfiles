@@ -13,6 +13,18 @@ keymap('n', '<c-l>', ':wincmd l<CR>', opts)
 -- Disable highlight
 keymap('n', '<leader>h', ':nohlsearch<CR>', opts)
 
+-- Save the current file with leader key + w
+keymap('n', '<leader>w', ':w<CR>', opts)
+
+-- Save and close the current file with leader key + c
+keymap('n', '<leader>c', ':w<CR>:bd<CR>', opts)
+
+-- Save all the files and quit the editor with leader key + x 
+keymap('n', '<leader>x', ':wa<CR>:qa<CR>', opts)
+
+-- Close all without saving and quit the editor with leader key + q
+keymap('n', '<leader>q', ':qa<CR>', opts)
+
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize -2<CR>", opts)
 keymap("n", "<C-Down>", ":resize +2<CR>", opts)

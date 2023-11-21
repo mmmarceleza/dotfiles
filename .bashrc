@@ -13,7 +13,7 @@ export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
 HISTCONTROL="erasedups:ignoreboth"
 
 # Set default editor to nvim if available, otherwise vim
-export EDITOR=${EDITOR:-$(which nvim || which vim || which vi)} 2>/dev/null
+export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2>/dev/null
 
 # importing my aliases and fuctions
 [ -f ~/.shell_aliases ] && . ~/.shell_aliases
@@ -27,3 +27,4 @@ export EDITOR=${EDITOR:-$(which nvim || which vim || which vi)} 2>/dev/null
 # adding Krew folder to the PATH (https://krew.sigs.k8s.io/)
 [ -d ~/.krew/bin ] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
+[ $(command -v zoxide) ] && eval "$(zoxide init bash)" # https://github.com/ajeetdsouza/zoxide

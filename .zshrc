@@ -14,7 +14,7 @@ export HISTSIZE=999999
 # HISTCONTROL="erasedups:ignoreboth"
 
 # Set default editor to nvim if available, otherwise vim
-export EDITOR=${EDITOR:-$(which nvim || which vim || which vi)} 2>/dev/null
+export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2>/dev/null
 
 # Use powerline
 USE_POWERLINE="true"
@@ -41,3 +41,6 @@ fi
 # adding Krew folder to the PATH (https://krew.sigs.k8s.io/)
 
 [ -d ~/.krew/bin ] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+[ $(command -v zoxide) ] && eval "$(zoxide init zsh)" # https://github.com/ajeetdsouza/zoxide
+

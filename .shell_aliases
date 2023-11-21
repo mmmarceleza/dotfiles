@@ -2,6 +2,17 @@
 alias g='git'
 alias git-show-alias='cat $HOME/.gitconfig'
 
+# neovim
+alias n='nvim'
+
+# some configurations
+[ $(command -v nvim) ] && alias vim="nvim"
+alias zshrc="vim ~/.zshrc"
+alias zshrcs="source ~/.zshrc"
+alias nvimrc="vim ~/.config/nvim"
+alias vimrc="vim ~/.vimrc"
+alias tmuxrc="vim ~/.tmux.conf"
+
 # cat customization
 [ $(command -v bat) ] && alias cat='bat --decorations=never'
 
@@ -10,6 +21,7 @@ alias c1='cd ..'
 alias c2='cd ../..'
 alias c3='cd ../../..'
 alias c4='cd ../../../..'
+[ $(command -v zoxide) ] && alias cd='z'
 
 # ls customization
 if [ $(command -v lsd) ]; then
@@ -31,7 +43,14 @@ else
   alias ffz='find . -type f -not -path './.git*' | fzf | xargs nvim'
 fi
 
+# git TODO
+#alias cb='git branch --sort=-committerdate | fzf --header "Checkout Recent Branch" --preview "git diff {1} --color=always" --pointer="" | xargs git checkout'
+
+# alias to manage my dotfiles -- https://github.com/mmmarceleza/dotfiles
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
+# weather
+alias weather='curl wttr.in/ipatinga'
 
 # Docker
 alias redis-cli='docker run --rm --network=host redis:alpine redis-cli'
