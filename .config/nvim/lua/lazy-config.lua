@@ -22,4 +22,5 @@ require("lazy").setup({
     -- BurntSushi/ripgrep is required for live_grep and grep_string and is the first priority for find_files.
     -- arch instalation: pacman -S ripgrep
   "lewis6991/gitsigns.nvim", -- https://github.com/lewis6991/gitsigns.nvim
+  {'akinsho/toggleterm.nvim', version = "*", config = true},
 })

@@ -27,4 +27,9 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 # adding Krew folder to the PATH (https://krew.sigs.k8s.io/)
 [ -d ~/.krew/bin ] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
+# enabling zoxide
 [ $(command -v zoxide) ] && eval "$(zoxide init bash)" # https://github.com/ajeetdsouza/zoxide
+
+# enabling starship
+[ $(command -v starship) ] && eval "$(starship init bash)" # https://starship.rs/
+

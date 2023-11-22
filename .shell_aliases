@@ -8,10 +8,13 @@ alias n='nvim'
 # some configurations
 [ $(command -v nvim) ] && alias vim="nvim"
 alias zshrc="vim ~/.zshrc"
+alias bashrc="vim ~/.bashrc"
+alias aliasrc="vim ~/.shell_aliases"
 alias zshrcs="source ~/.zshrc"
 alias nvimrc="vim ~/.config/nvim"
 alias vimrc="vim ~/.vimrc"
 alias tmuxrc="vim ~/.tmux.conf"
+alias starshiprc="vim ~/.config/starship.toml"
 
 # cat customization
 [ $(command -v bat) ] && alias cat='bat --decorations=never'

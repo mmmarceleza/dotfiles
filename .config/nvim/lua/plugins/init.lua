@@ -5,4 +5,5 @@ require "plugins.indentline"
 require "plugins.lualine"
 require "plugins.telescope"
 require "plugins.gitsigins"
+require "plugins.toggleterm"
 
