@@ -33,3 +33,9 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 # enabling starship
 [ $(command -v starship) ] && eval "$(starship init bash)" # https://starship.rs/
 
+# autocompletion for kubectl
+[ $(command -v kubectl) ] && source <(kubectl completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+[ $(command -v kubectl) ] && alias k=kubectl; complete -o default -F __start_kubectl k
+
+# autocompletion for flux
+[ $(command -v flux) ] && source <(flux completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.

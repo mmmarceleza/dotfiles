@@ -6,4 +6,6 @@ require "plugins.lualine"
 require "plugins.telescope"
 require "plugins.gitsigins"
 require "plugins.toggleterm"
+--require "plugins.illuminate"
+require "plugins.treesitter"
 
