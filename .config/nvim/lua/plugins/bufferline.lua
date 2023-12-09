@@ -7,15 +7,15 @@
 
 local status_ok, bufferline = pcall(require, "bufferline")
 if not status_ok then
-  return
+	return
 end
 
 bufferline.setup({
-  options = {
-    separator_style = "slant",
-    left_trunc_marker = "",
-    right_trunc_marker = "",
-  }
+	options = {
+		separator_style = "slant",
+		left_trunc_marker = "",
+		right_trunc_marker = "",
+	},
 })
 
 -- bufferline.setup {

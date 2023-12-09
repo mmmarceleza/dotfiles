@@ -1,16 +1,19 @@
-require "plugins.colorscheme"
-require "plugins.nvim-tree"
-require "plugins.bufferline"
-require "plugins.indentline"
-require "plugins.lualine"
-require "plugins.telescope"
-require "plugins.gitsigins"
-require "plugins.toggleterm"
-require "plugins.illuminate"
-require "plugins.treesitter"
-require "plugins.autocomplete"
-require "plugins.lsp"
-require "plugins.autopairs"
-require "plugins.comments"
-require "plugins.which-key"
-require "plugins.luasnip-config"
+require("plugins.colorscheme")
+require("plugins.nvim-tree")
+require("plugins.bufferline")
+require("plugins.indentline")
+require("plugins.lualine")
+require("plugins.telescope")
+require("plugins.gitsigins")
+require("plugins.toggleterm")
+require("plugins.illuminate")
+require("plugins.treesitter")
+require("plugins.autocomplete")
+require("plugins.lsp")
+require("plugins.autopairs")
+require("plugins.comments")
+require("plugins.which-key")
+require("plugins.luasnip-config")
+require("plugins.formatter")
+require("plugins.linters")
+require("plugins.mason")

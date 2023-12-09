@@ -8,13 +8,13 @@ local colorscheme = "tokyonight"
 
 local status_ok, _ = pcall(vim.cmd, "colorscheme " .. colorscheme)
 if not status_ok then
-  return
+	return
 end
 
 require("tokyonight").setup({
-  style = "moon", -- The theme comes in three styles, `storm`, `moon`, a darker variant `night` and `day`
+	style = "moon", -- The theme comes in three styles, `storm`, `moon`, a darker variant `night` and `day`
 })
 
 vim.o.termguicolors = true
 vim.o.background = "dark"
-vim.cmd[[colorscheme tokyonight]]
+vim.cmd([[colorscheme tokyonight]])

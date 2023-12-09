@@ -11,6 +11,7 @@ alias zshrc="vim ~/.zshrc"
 alias bashrc="vim ~/.bashrc"
 alias aliasrc="vim ~/.shell_aliases"
 alias zshrcs="source ~/.zshrc"
+alias bashrcs="source ~/.bashrc"
 alias nvimrc="vim ~/.config/nvim"
 alias vimrc="vim ~/.vimrc"
 alias tmuxrc="vim ~/.tmux.conf"
@@ -57,6 +58,7 @@ alias weather='curl wttr.in/ipatinga'
 
 # Docker
 alias redis-cli='docker run --rm --network=host redis:alpine redis-cli'
+alias shellcheck='docker run -v $(pwd):/mnt koalaman/shellcheck --color=always'
 
 # Personal Kubernetes 
 

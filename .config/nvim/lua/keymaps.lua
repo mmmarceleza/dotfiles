@@ -4,25 +4,25 @@ local opts = { noremap = true, silent = true }
 local keymap = vim.api.nvim_set_keymap
 
 -- Navigate vim panes better
-keymap('n', '<c-k>', ':wincmd k<CR>', opts)
-keymap('n', '<c-j>', ':wincmd j<CR>', opts)
-keymap('n', '<c-h>', ':wincmd h<CR>', opts)
-keymap('n', '<c-l>', ':wincmd l<CR>', opts)
+keymap("n", "<c-k>", ":wincmd k<CR>", opts)
+keymap("n", "<c-j>", ":wincmd j<CR>", opts)
+keymap("n", "<c-h>", ":wincmd h<CR>", opts)
+keymap("n", "<c-l>", ":wincmd l<CR>", opts)
 
 -- Disable highlight
-keymap('n', '<leader>h', ':nohlsearch<CR>', opts)
+keymap("n", "<leader>h", ":nohlsearch<CR>", opts)
 
 -- Save the current file with leader key + w
-keymap('n', '<leader>w', ':w<CR>', opts)
+keymap("n", "<leader>w", ":w<CR>", opts)
 
 -- Save and close the current file with leader key + c
-keymap('n', '<leader>c', ':w<CR>:bd<CR>', opts)
+keymap("n", "<leader>c", ":w<CR>:bd<CR>", opts)
 
--- Save all the files and quit the editor with leader key + x 
-keymap('n', '<leader>x', ':wa<CR>:qa<CR>', opts)
+-- Save all the files and quit the editor with leader key + x
+keymap("n", "<leader>x", ":wa<CR>:qa<CR>", opts)
 
 -- Close all without saving and quit the editor with leader key + q
-keymap('n', '<leader>q', ':qa<CR>', opts)
+keymap("n", "<leader>q", ":qa<CR>", opts)
 
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize -2<CR>", opts)
@@ -39,7 +39,7 @@ keymap("n", "<A-j>", "<Esc>:m .+1<CR>==gi", opts)
 keymap("n", "<A-k>", "<Esc>:m .-2<CR>==gi", opts)
 
 -- Insert --
--- Press jk fast to exit insert mode 
+-- Press jk fast to exit insert mode
 keymap("i", "jk", "<ESC>", opts)
 keymap("i", "kj", "<ESC>", opts)
 
