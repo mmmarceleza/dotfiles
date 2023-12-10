@@ -56,6 +56,10 @@ alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 # weather
 alias weather='curl wttr.in/ipatinga'
 
+# vpn
+alias vpnup='sudo wg-quick up protonvpn' # vpn connect
+alias vpndown='sudo wg-quick down protonvpn' # vpn disconnect
+
 # Docker
 alias redis-cli='docker run --rm --network=host redis:alpine redis-cli'
 alias shellcheck='docker run -v $(pwd):/mnt koalaman/shellcheck --color=always'
