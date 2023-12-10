@@ -73,6 +73,7 @@ packages=("actionlint"
     "virt-manager"
     "vscodium-bin"
     "whois"
+    "wireguard-tools"
     "xsel"
     "zellij"
     "zoxide")
