@@ -13,7 +13,8 @@ if ! command -v flatpak &> /dev/null; then
 fi
 
 # List of packages to install from the main repositories
-packages=("actionlint"
+packages=(
+    "actionlint"
     "authy"
     "bash-completion"
     "bat"
@@ -81,9 +82,12 @@ packages=("actionlint"
     "wireguard-tools"
     "xsel"
     "zellij"
-    "zoxide")
+    "zoxide"
+)
 
-flatpak_packages=("com.jgraph.drawio.desktop"
+# List of packages to install from Flathub (https://flathub.org/)
+flatpak_packages=(
+    "com.jgraph.drawio.desktop"
     "com.obsproject.Studio"
     "com.slack.Slack"
     "md.obsidian.Obsidian"
@@ -93,7 +97,14 @@ flatpak_packages=("com.jgraph.drawio.desktop"
     "org.kde.kdenlive"
     "org.libretro.RetroArch"
     "org.videolan.VLC"
-    "org.yuzu_emu.yuzu")
+    "org.yuzu_emu.yuzu"
+)
+
+# List of appimage packages to install
+appimage_packages=(
+    "https://gitlab.com/es-de/emulationstation-de/-/package_files/100250157/download emulationstation-de"
+    # "url package-name"
+)
 
 for pkg in "${packages[@]}"; do
     # Check if the package is in the official repositories
@@ -122,6 +133,26 @@ for pkg in "${flatpak_packages[@]}"; do
     else
         echo "Installing $pkg from Flathub..."
         flatpak install flathub "$pkg" -y || { echo "Error installing $pkg. Exiting."; exit 1; }
+    fi
+done
+
+# Create the directory to install appimage packages, if it doesn't exist
+app_dir="$HOME/Applications"
+mkdir -p "$app_dir" || { echo "Error creating $app_dir. Exiting."; exit 1; }
+
+# Install AppImage packages
+for pkg in "${appimage_packages[@]}"; do
+    # Split the package entry into URL and custom name
+    url=$(echo "$pkg" | awk '{print $1}')
+    custom_name=$(echo "$pkg" | awk '{print $2}')
+
+    app_path="$app_dir/$custom_name"
+
+    if [ -e "$app_path" ]; then
+        echo "$custom_name is already installed."
+    else
+        echo "Installing $custom_name from $url..."
+        wget -O "$app_path" "$url" && chmod +x "$app_path" || { echo "Error installing $custom_name. Exiting."; exit 1; }
     fi
 done
 
