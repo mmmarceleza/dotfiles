@@ -6,7 +6,13 @@ if ! command -v yay &> /dev/null; then
     sudo pacman -S yay --noconfirm || { echo "Error installing yay. Exiting."; exit 1; }
 fi
 
-# List of packages to install
+# Check if flatpak is installed
+if ! command -v flatpak &> /dev/null; then
+    echo "Flatpak is not installed. Installing flatpak..."
+    sudo pacman -S flatpak --noconfirm || { echo "Error installing flatpak. Exiting."; exit 1; }
+fi
+
+# List of packages to install from the main repositories
 packages=("actionlint"
     "authy"
     "bash-completion"
@@ -18,7 +24,6 @@ packages=("actionlint"
     "docker"
     "docker-compose"
     "fd"
-    "flatpak"
     "fzf"
     "git-delta"
     "github-cli"
@@ -78,6 +83,18 @@ packages=("actionlint"
     "zellij"
     "zoxide")
 
+flatpak_packages=("com.jgraph.drawio.desktop"
+    "com.obsproject.Studio"
+    "com.slack.Slack"
+    "md.obsidian.Obsidian"
+    "net.pcsx2.PCSX2"
+    "org.audacityteam.Audacity"
+    "org.jdownloader.JDownloader"
+    "org.kde.kdenlive"
+    "org.libretro.RetroArch"
+    "org.videolan.VLC"
+    "org.yuzu_emu.yuzu")
+
 for pkg in "${packages[@]}"; do
     # Check if the package is in the official repositories
     if yay -Qi "$pkg" &> /dev/null; then
@@ -95,6 +112,16 @@ for pkg in "${packages[@]}"; do
         # Package is not in the official repositories, use yay to install/update from AUR
         echo "Installing/Updating $pkg from AUR..."
         yay -Syu --noconfirm --needed "$pkg" || { echo "Error installing/updating $pkg. Exiting."; exit 1; }
+    fi
+done
+
+# Install Flatpak packages
+for pkg in "${flatpak_packages[@]}"; do
+    if flatpak list --app "$pkg" &> /dev/null; then
+        echo "$pkg is already installed."
+    else
+        echo "Installing $pkg from Flathub..."
+        flatpak install flathub "$pkg" -y || { echo "Error installing $pkg. Exiting."; exit 1; }
     fi
 done
 
