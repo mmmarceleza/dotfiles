@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# Verifica se foi fornecida exatamente uma versão como argumento
-if [ "$#" -ne 1 ]; then
-    echo "Uso: $0 <versão_do_kubectl>"
-    exit 1
-fi
-
 # Obtém a versão do kubectl fornecida como argumento
-KUBECTL_VERSION=$1
+KUBECTL_VERSION=$(gh release list \
+  --exclude-drafts \
+  --exclude-pre-releases \
+  --limit 100 \
+  --repo https://github.com/kubernetes/kubernetes | awk '{print $2}' | fzf --prompt="Select kubectl version: ")
 
 # Define a pasta de destino para os binários
 BIN_DIR="$HOME/.local/bin/kubectl-binaries"
