@@ -1,11 +1,12 @@
 #!/bin/bash
 
+for page in {1..4}
+do
+  KUBECTL_VERSION_ARRAY+=($(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases?page="$page" | jq -r '.[] | .tag_name'))
+done
+
 # Obtém a versão do kubectl fornecida como argumento
-KUBECTL_VERSION=$(gh release list \
-  --exclude-drafts \
-  --exclude-pre-releases \
-  --limit 100 \
-  --repo https://github.com/kubernetes/kubernetes | awk '{print $2}' | fzf --prompt="Select kubectl version: ")
+KUBECTL_VERSION=$(printf "%s\n" "${KUBECTL_VERSION_ARRAY[@]}" | fzf --prompt="Select kubectl version: ")
 
 # Define a pasta de destino para os binários
 BIN_DIR="$HOME/.local/bin/kubectl-binaries"
