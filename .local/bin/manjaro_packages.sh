@@ -43,6 +43,8 @@ packages=(
     "kubectx"
     "kustomize"
     "lazygit"
+    "libreoffice-fresh"
+    "libreoffice-fresh-pt-br"
     "lsd"
     "make"
     "meld"
