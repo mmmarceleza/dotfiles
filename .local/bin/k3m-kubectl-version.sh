@@ -9,7 +9,7 @@ done
 KUBECTL_VERSION=$(printf "%s\n" "${KUBECTL_VERSION_ARRAY[@]}" | fzf --prompt="Select kubectl version: ")
 
 # Define a pasta de destino para os binários
-BIN_DIR="$HOME/.local/bin/kubectl-binaries"
+BIN_DIR="$HOME/.local/bin/download-binaries"
 
 # Cria a pasta de destino se não existir
 mkdir -p "$BIN_DIR"
