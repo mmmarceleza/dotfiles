@@ -28,6 +28,7 @@ packages=(
     "fzf"
     "git-delta"
     "github-cli"
+    "go-yq"
     "go"
     "google-chrome"
     "hadolint-bin"
