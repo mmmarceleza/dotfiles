@@ -1,7 +1,13 @@
 #!/bin/bash
 
-TELEPORT_VERSION="14.1.3"
+# Teleport client version to download
+TELEPORT_VERSION="v14.1.3"
 
+# Default path to download binaries (it is listed in the .gitignore)
+BIN_DIR="$HOME/.local/bin/download-binaries"
+mkdir -p "$BIN_DIR"
+
+# krew plugins to use in the system (https://krew.sigs.k8s.io/plugins/)
 KREW_PLUGINS=(
   "access-matrix"     # https://github.com/corneliusweig/rakkess/blob/master/doc/USAGE.md 
   "ca-cert"           # https://github.com/ahmetb/kubectl-extras
@@ -13,7 +19,8 @@ KREW_PLUGINS=(
   "popeye"            # https://popeyecli.io/
   "resource-capacity" # https://github.com/robscott/kube-capacity
   "view-cert")        # https://github.com/lmolas/kubectl-view-cert
- 
+
+# Helm repositories to use in the system
 HELM_REPOS=(
   "prometheus-community https://prometheus-community.github.io/helm-charts"
   "metrics-server       https://kubernetes-sigs.github.io/metrics-server/"
@@ -59,12 +66,17 @@ else
 fi
 
 # Installing some plugins via krew
+source "$HOME"/.bashrc
 for plugin in "${KREW_PLUGINS[@]}"; do
-  kubectl krew install "$plugin"
+  if kubectl krew info "$plugin" >/dev/null 2>&1; then
+    echo "$plugin plugin, for kubectl, is already installed"
+  else
+    kubectl krew install "$plugin"
+  fi
 done
 
 # Installing Teleport client
-if [ "$(tsh version | awk '{sub(/v/, ""); printf $2}')" == "$TELEPORT_VERSION" ]; then
+if [[ "$(tsh version | awk '{printf $2; sub(/v/, "")}')" = "$TELEPORT_VERSION" ]]; then
   echo "Teleport client already installed"
 else
   curl https://goteleport.com/static/install.sh | bash -s "$TELEPORT_VERSION"
@@ -75,3 +87,18 @@ for repo in "${HELM_REPOS[@]}"; do
   helm repo add $repo
 done
 helm repo update
+
+# Installing Flux client
+
+
+# Installing hcl2json
+if [ "$(command -v hcl2json)" ]; then
+  echo "hcl2json already installed"
+else
+  DOWNLOAD_URL_HCL2JSON=$(curl -s https://api.github.com/repos/tmccombs/hcl2json/releases/latest \
+    | jq -r --arg name "hcl2json_linux_amd64" '.assets[] | select(.name == $name) | .browser_download_url')
+  curl -fsSL "$DOWNLOAD_URL_HCL2JSON" -o "$BIN_DIR/hcl2json"
+  chmod +x "$BIN_DIR"/hcl2json
+  ln -sf "$BIN_DIR"/hcl2json "$HOME"/.local/bin/hcl2json
+  echo "hcl2json instalado em $HOME/.local/bin/"
+fi
