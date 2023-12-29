@@ -1,15 +1,53 @@
 #!/bin/bash
 
-# Check if yay is installed
-if ! command -v yay &> /dev/null; then
-    echo "yay is not installed. Installing yay..."
-    sudo pacman -S yay --noconfirm || { echo "Error installing yay. Exiting."; exit 1; }
+red=$(tput setaf 1)
+yellow=$(tput setaf 3)
+reset=$(tput sgr0)
+
+# function to return a message and exit the program
+function abort ()
+{
+  echo "$red$*$reset"
+  exit 2
+}
+
+# function to print a colored message
+function title ()
+{
+  echo "${yellow}$*$reset"
+}
+
+# function to install a specifc package with pacman
+function require_package ()
+{
+  # check if receive one parameter
+  if [ $# -ne 1 ]; then
+    abort "${FUNCNAME[0]}: missing required parameters"
+  fi
+  # check if package is already installed
+  if command -v "$1" &> /dev/null; then
+    return
+  fi
+  echo "$1 is not installed. Installing $1..."
+  pacman -S "$1" --noconfirm || abort "Error installing $1"
+}
+
+# check if it is running with root
+if [ $UID -ne 0 ]; then
+  abort "you must run as root"
 fi
 
-# Check if flatpak is installed
-if ! command -v flatpak &> /dev/null; then
-    echo "Flatpak is not installed. Installing flatpak..."
-    sudo pacman -S flatpak --noconfirm || { echo "Error installing flatpak. Exiting."; exit 1; }
+# check if has one parameter 
+if [ $# -ne 1 ]; then
+  abort "missiing user name"
+fi
+
+# set the variable user home path
+eval USER_HOME=~"$1"
+
+# check if the user home exists
+if ! [ -d "$USER_HOME" ]; then
+  abort "userdir not found: $1"
 fi
 
 # List of packages to install from the main repositories
@@ -58,6 +96,7 @@ packages=(
     "paru-bin"
     "peek"
     "podman"
+    "python-pip"
     "qbittorrent"
     "qemu-full"
     "rclone"
@@ -78,6 +117,7 @@ packages=(
     "ttf-hack-nerd"
     "unzip"
     "vagrant"
+    "velero-bin"
     "vim"
     "virt-manager"
     "vscodium-bin"
@@ -90,6 +130,8 @@ packages=(
 
 # List of packages to install from Flathub (https://flathub.org/)
 flatpak_packages=(
+    "com.calibre_ebook.calibre"
+    "com.github.johnfactotum.Foliate"
     "com.jgraph.drawio.desktop"
     "com.obsproject.Studio"
     "com.slack.Slack"
@@ -105,57 +147,43 @@ flatpak_packages=(
 
 # List of appimage packages to install
 appimage_packages=(
-    "https://gitlab.com/es-de/emulationstation-de/-/package_files/100250157/download emulationstation-de"
+    "emulationstation-de:https://gitlab.com/es-de/emulationstation-de/-/package_files/100250157/download"
     # "url package-name"
 )
 
-for pkg in "${packages[@]}"; do
-    # Check if the package is in the official repositories
-    if yay -Qi "$pkg" &> /dev/null; then
-        # Package is in the official repositories, check if it needs an update
-        installed_version=$(yay -Qi "$pkg" | awk '/^Version/ {print $3}')
-        available_version=$(yay -Si "$pkg" | awk '/^Version/ {print $3}')
-        
-        if [[ "$installed_version" != "$available_version" ]]; then
-            echo "Updating $pkg..."
-            yay -Syu --noconfirm --needed "$pkg"
-        else
-            echo "$pkg is already up-to-date."
-        fi
-    else
-        # Package is not in the official repositories, use yay to install/update from AUR
-        echo "Installing/Updating $pkg from AUR..."
-        yay -Syu --noconfirm --needed "$pkg" || { echo "Error installing/updating $pkg. Exiting."; exit 1; }
-    fi
-done
+# List of python packages to install
+python_packages=(
+  "giturlparse"
+  "python-hcl2"
+  )
 
-# Install Flatpak packages
-for pkg in "${flatpak_packages[@]}"; do
-    if flatpak list --app "$pkg" &> /dev/null; then
-        echo "$pkg is already installed."
-    else
-        echo "Installing $pkg from Flathub..."
-        flatpak install flathub "$pkg" -y || { echo "Error installing $pkg. Exiting."; exit 1; }
-    fi
-done
+# installing yay packages
+title "Installing yay packages"
+require_package yay
+yay -Syu --noconfirm --needed "${packages[@]}" || abort "Error installing/updating packages"
+
+# installing Flatpak packages
+title "Installing flatpak packages"
+require_package flatpak
+flatpak install flathub -y "${flatpak_packages[@]}" || abort "Error installing flatpak package"
 
 # Create the directory to install appimage packages, if it doesn't exist
-app_dir="$HOME/Applications"
-mkdir -p "$app_dir" || { echo "Error creating $app_dir. Exiting."; exit 1; }
+title "Installing AppImage packages"
+app_dir=$USER_HOME/Applications
+mkdir -p "$app_dir" || abort "failed in creating of $app_dir"
 
-# Install AppImage packages
 for pkg in "${appimage_packages[@]}"; do
     # Split the package entry into URL and custom name
-    url=$(echo "$pkg" | awk '{print $1}')
-    custom_name=$(echo "$pkg" | awk '{print $2}')
+    url=${pkg#*:}
+    name=${pkg%%:*}
 
-    app_path="$app_dir/$custom_name"
+    path="$app_dir/$name"
 
-    if [ -e "$app_path" ]; then
-        echo "$custom_name is already installed."
+    if [ -e "$path" ]; then
+        echo "$name is already installed."
     else
-        echo "Installing $custom_name from $url..."
-        wget -O "$app_path" "$url" && chmod +x "$app_path" || { echo "Error installing $custom_name. Exiting."; exit 1; }
+        echo "Installing $name from $url..."
+        wget -O "$path" "$url" && chmod +x "$path" || abort "Error installing $name"
     fi
 done
 
