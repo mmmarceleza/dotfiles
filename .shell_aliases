@@ -29,7 +29,6 @@ alias c4='cd ../../../..'
 
 # ls customization
 if [ $(command -v lsd) ]; then
-  alias ls='lsd'
   alias ls='lsd --group-dirs first'
   alias l='ls -lah'
 else
