@@ -82,8 +82,10 @@ symbol = '☸'
 style = 'cyan bold'
 format = '[[ $symbol $context( \($namespace\))](fg:#a0a9cb bg:#1d2230)]($style)'
 disabled = false
-[kubernetes.contexts]
-'^getup\.teleport\.sh-\.*(?P<var_cluster>[\w-]+)' = '$var_cluster'
+
+[[kubernetes.contexts]]
+context_pattern = '^getup\.teleport\.sh-\.*(?P<var_cluster>[\w-]+)'
+context_alias = '$var_cluster'
 
 [os]
 format = "[($symbol)]($style)"

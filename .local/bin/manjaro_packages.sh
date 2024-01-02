@@ -33,13 +33,13 @@ function require_package ()
 }
 
 # check if it is running with root
-if [ $UID -ne 0 ]; then
-  abort "you must run as root"
-fi
+# if [ $UID -ne 0 ]; then
+#   abort "you must run as root"
+# fi
 
 # check if has one parameter 
 if [ $# -ne 1 ]; then
-  abort "missiing user name"
+  abort "missing user name"
 fi
 
 # set the variable user home path
