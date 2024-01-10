@@ -50,10 +50,44 @@ if ! [ -d "$USER_HOME" ]; then
   abort "userdir not found: $1"
 fi
 
+# Check if a unit exists, enable and start it if necessary
+function enable_start_unit() {
+  [ $# -eq 0 ] && return 1
+
+  local unit_name=$1
+
+  # Check if the unit exists
+  if ! systemctl cat --no-pager "$unit_name" &>/dev/null ; then
+    echo "Unit $unit_name does not exist on the system."
+    return
+  fi
+
+  # Check if the unit is enabled
+  if systemctl is-enabled --quiet "$unit_name"; then
+    echo "Unit $unit_name is already enabled."
+  else
+    # Enable the unit if it's not already enabled
+    echo "Enabling unit $unit_name..."
+    sudo systemctl enable "$unit_name"
+  fi
+
+  # Check if the unit is running
+  if systemctl is-active --quiet "$unit_name"; then
+    echo "Unit $unit_name is already running."
+    return
+  fi
+
+  # Start the unit if it's not already running
+  echo "Starting unit $unit_name..."
+  sudo systemctl start "$unit_name"
+}
+
+
 # List of packages to install from the main repositories
 packages=(
     "actionlint"
     "authy"
+    "base-devel"
     "bash-completion"
     "bat"
     "brave-browser"
@@ -123,6 +157,7 @@ packages=(
     "vscodium-bin"
     "whois"
     "wireguard-tools"
+    "xca"
     "xsel"
     "zellij"
     "zoxide"
@@ -186,5 +221,25 @@ for pkg in "${appimage_packages[@]}"; do
         wget -O "$path" "$url" && chmod +x "$path" || abort "Error installing $name"
     fi
 done
+
+# installing python packges
+title "Installing python packages"
+pip install "${python_packages[@]}" --break-system-packages || abort "Error installing/updating packages"
+
+# enabling some systemd units
+title "Enabling some systemd units"
+enable_start_unit libvirtd
+enable_start_unit docker
+
+# installing vagrant plugins
+title "Installing vagrant plugins"
+PLUGIN_LIST=$(vagrant plugin list)
+PLUGIN_LIST=${PLUGIN_LIST%% *}
+if [ "$PLUGIN_LIST" = "vagrant-libvirt" ]; then
+  echo "vagrant-libvirt plugin is already installed"
+else
+  echo "installing vagrant plugin"
+  # vagrant plugin install vagrant-libvirt
+fi
 
 echo "Package installation/update complete."
