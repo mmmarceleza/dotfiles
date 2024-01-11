@@ -1,25 +1,21 @@
 #!/bin/bash
 
-red=$(tput setaf 1)
-yellow=$(tput setaf 3)
-reset=$(tput sgr0)
-
+#------------------------------------------------------------------------------
+#                                  Functions
+#------------------------------------------------------------------------------
 # function to return a message and exit the program
-function abort ()
-{
+function abort () {
   echo "$red$*$reset"
   exit 2
 }
 
 # function to print a colored message
-function title ()
-{
+function title () {
   echo "${yellow}$*$reset"
 }
 
 # function to install a specifc package with pacman
-function require_package ()
-{
+function require_package () {
   # check if receive one parameter
   if [ $# -ne 1 ]; then
     abort "${FUNCNAME[0]}: missing required parameters"
@@ -31,24 +27,6 @@ function require_package ()
   echo "$1 is not installed. Installing $1..."
   pacman -S "$1" --noconfirm || abort "Error installing $1"
 }
-
-# check if it is running with root
-# if [ $UID -ne 0 ]; then
-#   abort "you must run as root"
-# fi
-
-# check if has one parameter 
-if [ $# -ne 1 ]; then
-  abort "missing user name"
-fi
-
-# set the variable user home path
-eval USER_HOME=~"$1"
-
-# check if the user home exists
-if ! [ -d "$USER_HOME" ]; then
-  abort "userdir not found: $1"
-fi
 
 # Check if a unit exists, enable and start it if necessary
 function enable_start_unit() {
@@ -82,7 +60,47 @@ function enable_start_unit() {
   sudo systemctl start "$unit_name"
 }
 
+# add user to a group in /etc/group
+function add_user_to_group () {
+  [ $# -ne 1 ] && return 1
 
+  local group=$1
+
+  if ! grep -E "^$group:" /etc/group | grep "$1" &>/dev/null; then
+    usermod -aG "$group" "$SCRIPT_USER"
+  fi
+}
+
+#------------------------------------------------------------------------------
+#                        Initial Validations and Variables
+#------------------------------------------------------------------------------
+# variables to put some color in the terminal
+red=$(tput setaf 1)
+yellow=$(tput setaf 3)
+reset=$(tput sgr0)
+
+# check if the script received only one parameter 
+if [ $# -ne 1 ]; then
+  abort "Enter only the user name"
+fi
+
+# check if the parameter is a user in the system
+if ! id "$1" &>/dev/null; then
+  abort "User $1 do not exists on the system."
+fi
+
+# set the variable user home path
+SCRIPT_USER="$1"
+eval USER_HOME=~"$1"
+
+# check if the user home exists
+if ! [ -d "$USER_HOME" ]; then
+  abort "userdir not found: $1"
+fi
+
+#------------------------------------------------------------------------------
+#                                  Main Script
+#------------------------------------------------------------------------------
 # List of packages to install from the main repositories
 packages=(
     "actionlint"
@@ -230,6 +248,10 @@ pip install "${python_packages[@]}" --break-system-packages || abort "Error inst
 title "Enabling some systemd units"
 enable_start_unit libvirtd
 enable_start_unit docker
+
+# adding user on some linux groups
+add_user_to_group docker
+add_user_to_group libvirt
 
 # installing vagrant plugins
 title "Installing vagrant plugins"
