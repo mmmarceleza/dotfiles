@@ -145,6 +145,7 @@ packages=(
     "nodejs"
     "npm"
     "okd-client-bin"
+    "openfortivpn"
     "paru-bin"
     "peek"
     "podman"
