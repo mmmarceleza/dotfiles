@@ -50,6 +50,9 @@ HELM_REPOS=(
   "minio                https://operator.min.io/"
   "strimzi              https://strimzi.io/charts/"
   "undistro             https://charts.undistro.io"
+  "aws-ebs-csi-driver   https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
+  "aws-efs-csi-driver   https://kubernetes-sigs.github.io/aws-efs-csi-driver"
+  "eks                  https://aws.github.io/eks-charts"
   )
 
 # Install krew (https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
@@ -101,4 +104,16 @@ else
   chmod +x "$BIN_DIR"/hcl2json
   ln -sf "$BIN_DIR"/hcl2json "$HOME"/.local/bin/hcl2json
   echo "hcl2json instalado em $HOME/.local/bin/"
+fi
+
+# Installing kubescape
+if [ "$(command -v kubescape)" ]; then
+  echo "kubescape already installed"
+else
+  DOWNLOAD_URL_KUBESCAPE=$(curl -s https://api.github.com/repos/kubescape/kubescape/releases/latest \
+    | jq -r --arg name "kubescape-ubuntu-latest" '.assets[] | select(.name == $name) | .browser_download_url')
+  curl -fsSL "$DOWNLOAD_URL_KUBESCAPE" -o "$BIN_DIR/kubescape"
+  chmod +x "$BIN_DIR"/kubescape
+  ln -sf "$BIN_DIR"/kubescape "$HOME"/.local/bin/kubescape
+  echo "kubescape instalado em $HOME/.local/bin/"
 fi
