@@ -133,6 +133,8 @@ packages=(
     "kind-bin"
     "kubectl"
     "kubectx"
+    "kube-lint"
+    "kubeval-bin"
     "kustomize"
     "lazygit"
     "libreoffice-fresh"
