@@ -53,6 +53,7 @@ HELM_REPOS=(
   "aws-ebs-csi-driver   https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
   "aws-efs-csi-driver   https://kubernetes-sigs.github.io/aws-efs-csi-driver"
   "eks                  https://aws.github.io/eks-charts"
+  "kubernetes-dashboard https://kubernetes.github.io/dashboard"
   )
 
 # Install krew (https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
