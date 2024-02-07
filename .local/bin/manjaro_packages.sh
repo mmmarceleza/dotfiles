@@ -134,6 +134,7 @@ packages=(
     "kubectl"
     "kubectx"
     "kube-lint"
+    "kubepug-bin"
     "kubeval-bin"
     "kustomize"
     "lazygit"
