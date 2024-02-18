@@ -217,6 +217,7 @@ appimage_packages=(
 python_packages=(
   "giturlparse"
   "python-hcl2"
+  "auto-editor"
   )
 
 # installing yay packages
