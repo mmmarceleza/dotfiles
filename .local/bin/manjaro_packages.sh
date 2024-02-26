@@ -163,6 +163,7 @@ packages=(
     "starship"
     "steam"
     "stow"
+    "tailscale"
     "telegram-desktop"
     "terraform"
     "thunderbird"
