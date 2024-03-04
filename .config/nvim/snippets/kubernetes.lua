@@ -49,7 +49,7 @@ ls.add_snippets("all", {
 		)
 	),
 
-	-- nodeAffinity
+	-- nodeAffinity required
 	s(
 		"nodeaffinity-required",
 		fmt(
@@ -58,11 +58,34 @@ ls.add_snippets("all", {
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: {}
-                operator: In
-                values:
-                - {}
+              - matchExpressions:
+                  - key: {}
+                    operator: In
+                    values:
+                    - {}
+    ]],
+			{
+				i(1, "role"),
+				i(2, "<Value>"),
+			}
+		)
+	),
+
+	-- nodeAffinity prefered
+	s(
+		"nodeaffinity-prefered",
+		fmt(
+			[[
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: {}
+                    operator: In
+                    values:
+                      - {}
     ]],
 			{
 				i(1, "role"),

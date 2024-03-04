@@ -12,7 +12,7 @@ Name=marcelo-zsh
 Parent=FALLBACK/
 
 [Scrolling]
-HistoryMode=1
+HistoryMode=2
 HistorySize=10000
 
 [Terminal Features]

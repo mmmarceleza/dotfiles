@@ -71,6 +71,7 @@ require("lspconfig").yamlls.setup({
 					"*hpa*.yaml",
 					"*pv*.yaml",
 					"*cronjob*.yaml",
+					"*job*.yaml",
 				},
 				--["http://json.schemastore.org/github-workflow"] = ".github/workflows/*",
 				--["http://json.schemastore.org/github-action"] = ".github/action.{yml,yaml}",
@@ -87,6 +88,20 @@ require("lspconfig").yamlls.setup({
 				["https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj/application_v1alpha1.json"] = "*application*.{yml,yaml}",
 				["https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json"] = "*helmrelease*.{yml,yaml}",
 				["https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrepository-source-v1beta1.json"] = "*helmrepository*.{yml.yaml}",
+			},
+		},
+	},
+})
+
+--------------------------------
+-- Helm Language Server Protocol
+--------------------------------
+-- https://github.com/mrjosh/helm-ls
+require("lspconfig").helm_ls.setup({
+	settings = {
+		["helm-ls"] = {
+			yamlls = {
+				path = "yaml-language-server",
 			},
 		},
 	},

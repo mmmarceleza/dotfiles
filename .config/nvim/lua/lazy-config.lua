@@ -194,6 +194,11 @@ require("lazy").setup({
 	-- Improve the default vim.ui interfaces
 	----------------------------------------
 	"stevearc/dressing.nvim", -- https://github.com/stevearc/dressing.nvim
+
+	----------------------------------------
+	-- Vim syntax for helm templates
+	----------------------------------------
+	"towolf/vim-helm",
 })
 
 -- TODO

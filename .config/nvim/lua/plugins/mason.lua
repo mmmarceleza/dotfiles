@@ -56,5 +56,6 @@ mason_tool_installer.setup({
 		"gofumpt", -- go formatter
 		"goimports", -- go formatter
 		"golines", -- go formatter
+		"helm-ls", -- helm language server
 	},
 })
