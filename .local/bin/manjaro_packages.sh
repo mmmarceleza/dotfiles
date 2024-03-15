@@ -105,6 +105,7 @@ fi
 packages=(
     "actionlint"
     "authy"
+    "aws-cli-v2"
     "base-devel"
     "bash-completion"
     "bat"
@@ -145,7 +146,6 @@ packages=(
     "meld"
     "mtr"
     "neovim"
-    "nextcloud-client"
     "nodejs"
     "npm"
     "okd-client-bin"
