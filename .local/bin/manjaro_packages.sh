@@ -111,6 +111,7 @@ packages=(
     "bat"
     "brave-browser"
     "btop"
+    "cosign"
     "discord"
     "dive"
     "docker"
