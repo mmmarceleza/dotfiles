@@ -200,6 +200,7 @@ flatpak_packages=(
     "com.jgraph.drawio.desktop"
     "com.obsproject.Studio"
     "com.slack.Slack"
+    "com.spotify.Client"
     "md.obsidian.Obsidian"
     "net.pcsx2.PCSX2"
     "org.audacityteam.Audacity"
