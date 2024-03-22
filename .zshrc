@@ -29,6 +29,7 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 HISTFILE=~/.zhistory
 export HISTFILESIZE=999999
 export HISTSIZE=999999
+export SAVEHIST=999999
 
 ## Keybindings section
 bindkey -e
@@ -103,6 +104,9 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 
 # autocompletion for flux
 [ $(command -v flux) ] && source <(flux completion zsh) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+
+# enabling aws-assume-role to work as a function
+[ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0
 
 # install zsh-syntax-highlighting -- https://github.com/zsh-users/zsh-syntax-highlighting
 if [ -d ~/.zshplugins/zsh-syntax-highlighting ]; then

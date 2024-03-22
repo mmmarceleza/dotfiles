@@ -39,3 +39,6 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 
 # autocompletion for flux
 [ $(command -v flux) ] && source <(flux completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+
+# enabling aws-assume-role to work as a function
+[ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0

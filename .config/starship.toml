@@ -12,12 +12,19 @@ $rust\
 $golang\
 $php\
 [](fg:#212736 bg:#1d2230)\
+$aws\
+[](fg:#212736 bg:#1d2230)\
 $kubernetes\
 [](fg:#212736 bg:#1d2230)\
 $time\
 [ ](fg:#1d2230)\
 \n$character"""
 #
+
+[aws]
+format = '[$symbol($profile )(\($region\) )](fg:#a0a9cb bg:#1d2230)($style)'
+symbol = '󰅡 '
+style = 'bold blue'
 
 [cmd_duration]
 #min_time = 500
