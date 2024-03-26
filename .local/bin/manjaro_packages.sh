@@ -122,6 +122,7 @@ packages=(
     "git-delta"
     "github-cli"
     "gnu-netcat"
+    "grype-bin"
     "go-yq"
     "go"
     "google-chrome"
