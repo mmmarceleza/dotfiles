@@ -167,6 +167,7 @@ packages=(
     "steam"
     "stow"
     "tailscale"
+    "tailspin"
     "telegram-desktop"
     "terraform"
     "thunderbird"
