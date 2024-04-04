@@ -113,6 +113,7 @@ packages=(
     "btop"
     "buildah"
     "cosign"
+    "crane"
     "discord"
     "dive"
     "docker"
