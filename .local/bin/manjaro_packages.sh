@@ -136,6 +136,7 @@ packages=(
     "kdiff3"
     "keepassxc"
     "kind-bin"
+    "kyverno-git"
     "kubectl"
     "kubectx"
     "kube-lint"
