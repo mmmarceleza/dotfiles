@@ -223,9 +223,10 @@ appimage_packages=(
 
 # List of python packages to install
 python_packages=(
+  "auto-editor"
   "giturlparse"
   "python-hcl2"
-  "auto-editor"
+  "robusta-cli"
   )
 
 # installing yay packages
