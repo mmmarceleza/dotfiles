@@ -104,6 +104,7 @@ fi
 # List of packages to install from the main repositories
 packages=(
     "actionlint"
+    "arogcd"
     "authy"
     "aws-cli-v2"
     "base-devel"
@@ -226,7 +227,6 @@ python_packages=(
   "auto-editor"
   "giturlparse"
   "python-hcl2"
-  "robusta-cli"
   )
 
 # installing yay packages
