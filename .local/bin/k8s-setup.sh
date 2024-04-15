@@ -50,6 +50,7 @@ HELM_REPOS=(
   "metrics-server       https://kubernetes-sigs.github.io/metrics-server/"
   "minio                https://operator.min.io/"
   "openebs              https://openebs.github.io/charts"
+  "podinfo              https://stefanprodan.github.io/podinfo"
   "prometheus-community https://prometheus-community.github.io/helm-charts"
   "strimzi              https://strimzi.io/charts/"
   "teleport             https://charts.releases.teleport.dev"
