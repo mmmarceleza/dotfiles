@@ -202,6 +202,7 @@ packages=(
 flatpak_packages=(
     "com.calibre_ebook.calibre"
     "com.github.johnfactotum.Foliate"
+    "com.github.KRTirtho.Spotube"
     "com.jgraph.drawio.desktop"
     "com.obsproject.Studio"
     "com.slack.Slack"
