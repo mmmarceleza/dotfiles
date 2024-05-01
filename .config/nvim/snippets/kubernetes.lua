@@ -31,6 +31,44 @@ ls.add_snippets("all", {
 		)
 	),
 
+	-- Deployment manifest
+	s(
+		"deployment",
+		fmt(
+			[[
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: {}
+          namespace: {}
+          labels:
+            app: {}
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: {}
+          template:
+            metadata:
+              labels:
+                app: {}
+            spec:
+              containers:
+                - image: {}
+                  name: {}
+    ]],
+			{
+				i(1, "<Deploy Name>"),
+				rep(1),
+				rep(1),
+				rep(1),
+				rep(1),
+				i(2, "<Image>"),
+				rep(1),
+			}
+		)
+	),
+
 	-- Toleration
 	s(
 		"toleration",
