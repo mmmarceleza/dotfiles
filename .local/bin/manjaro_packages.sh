@@ -67,7 +67,7 @@ function add_user_to_group () {
   local group=$1
 
   if ! grep -E "^$group:" /etc/group | grep "$1" &>/dev/null; then
-    usermod -aG "$group" "$SCRIPT_USER"
+    sudo usermod -aG "$group" "$SCRIPT_USER"
   fi
 }
 
