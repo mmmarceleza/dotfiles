@@ -25,7 +25,7 @@ function require_package () {
     return
   fi
   echo "$1 is not installed. Installing $1..."
-  pacman -S "$1" --noconfirm || abort "Error installing $1"
+  sudo pacman -S "$1" --noconfirm || abort "Error installing $1"
 }
 
 # Check if a unit exists, enable and start it if necessary
@@ -156,7 +156,7 @@ packages=(
     "npm"
     "okd-client-bin"
     "openfortivpn"
-    "paru-bin"
+    # "paru-bin"
     "peek"
     "podman"
     "python-pip"
