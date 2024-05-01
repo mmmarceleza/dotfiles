@@ -199,6 +199,18 @@ require("lazy").setup({
 	-- Vim syntax for helm templates
 	----------------------------------------
 	"towolf/vim-helm",
+
+	----------------------------------------
+	-- Markdown Preview for (Neo)vim
+	----------------------------------------
+	{
+		"iamcco/markdown-preview.nvim",
+		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		ft = { "markdown" },
+		build = function()
+			vim.fn["mkdp#util#install"]()
+		end,
+	},
 })
 
 -- TODO
