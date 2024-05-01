@@ -200,8 +200,6 @@ packages=(
 
 # List of packages to install from Flathub (https://flathub.org/)
 flatpak_packages=(
-    "com.calibre_ebook.calibre"
-    "com.github.johnfactotum.Foliate"
     "com.github.KRTirtho.Spotube"
     "com.jgraph.drawio.desktop"
     "com.obsproject.Studio"
@@ -214,12 +212,11 @@ flatpak_packages=(
     "org.kde.kdenlive"
     "org.libretro.RetroArch"
     "org.videolan.VLC"
-    "org.yuzu_emu.yuzu"
 )
 
 # List of appimage packages to install
 appimage_packages=(
-    "emulationstation-de:https://gitlab.com/es-de/emulationstation-de/-/package_files/100250157/download"
+    "emulationstation-de:https://gitlab.com/es-de/emulationstation-de/-/package_files/117882100/download"
     # "url package-name"
 )
 
