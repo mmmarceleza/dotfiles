@@ -66,8 +66,8 @@ function add_user_to_group () {
 
   local group=$1
 
-  if ! grep -E "^$group:" /etc/group | grep "$1" &>/dev/null; then
-    sudo usermod -aG "$group" "$SCRIPT_USER"
+  if ! grep -E "^$group:" /etc/group | grep "$SCRIPT_USER" &>/dev/null; then
+    sudo usermod -aG "$group" "$SCRIPT_USER"; echo "usermod"
   fi
 }
 
@@ -267,6 +267,7 @@ enable_start_unit libvirtd
 enable_start_unit docker
 
 # adding user on some linux groups
+title "Adding USER on some linux groups"
 add_user_to_group docker
 add_user_to_group libvirt
 
