@@ -14,6 +14,7 @@ Parent=FALLBACK/
 [Scrolling]
 HistoryMode=2
 HistorySize=10000
+ScrollFullPage=1
 
 [Terminal Features]
 BlinkingCursorEnabled=true

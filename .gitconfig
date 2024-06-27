@@ -10,7 +10,7 @@
   br   = branch --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(contents:subject) %(color:green)(%(committerdate:relative)) [%(authorname)]' --sort=-committerdate
   save = !git add -A && git commit -m 'chore: commit save point'
   undo = reset HEAD~1 --mixed
-  done = !git push origin HEAD
+  done = !git push origin main
   pl   = !git pull origin main
   d    = diff
 [core]

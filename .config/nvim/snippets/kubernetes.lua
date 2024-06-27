@@ -131,4 +131,52 @@ ls.add_snippets("all", {
 			}
 		)
 	),
+
+	-- podAffinity prefered
+	s(
+		"podAffinity-prefered",
+		fmt(
+			[[
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: {}
+                    operator: In
+                    values:
+                    - {}
+              topologyKey: topology.kubernetes.io/zone
+    ]],
+			{
+				i(1, "<Key>"),
+				i(2, "<Value>"),
+			}
+		)
+	),
+
+	-- podAffinity required
+	s(
+		"podAffinity-required",
+		fmt(
+			[[
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: {}
+                operator: In
+                values:
+                - {}
+            topologyKey: topology.kubernetes.io/zone
+    ]],
+			{
+				i(1, "<Key>"),
+				i(2, "<Value>"),
+			}
+		)
+	),
 })
