@@ -41,6 +41,7 @@ HELM_REPOS=(
   "istio                https://istio-release.storage.googleapis.com/charts"
   "jenkins              https://charts.jenkins.io"
   "jetstack             https://charts.jetstack.io"
+  "kedacore             https://kedacore.github.io/charts"
   "kiali                https://kiali.org/helm-charts"
   "kong                 https://charts.konghq.com"
   "kubernetes-dashboard https://kubernetes.github.io/dashboard"
