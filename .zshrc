@@ -1,7 +1,8 @@
 #------------------------------------------------------------------------------
 # .zshrc
-# Author: Marcelo Melo
-# Source: http://github.com/mmmmarceleza/dotfiles/.zshrc
+# Author:    Marcelo Melo
+# Source:    http://github.com/mmmmarceleza/dotfiles/.zshrc
+# Reference: https://zsh.sourceforge.io/Doc/zsh_a4.pdf (Updated May 14, 2022)
 #------------------------------------------------------------------------------
 
 # --------------------------- Path configuration ------------------------------

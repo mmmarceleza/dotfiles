@@ -1,7 +1,8 @@
 #------------------------------------------------------------------------------
 # .bashrc
-# Author: Marcelo Melo
-# Source: http://github.com/mmmmarceleza/dotfiles/.bashrc
+# Author:    Marcelo Melo
+# Source:    http://github.com/mmmmarceleza/dotfiles/.bashrc
+# Reference: https://www.gnu.org/software/bash/manual/bash.pdf (September 2022)
 #------------------------------------------------------------------------------
 
 # Bash Variables
