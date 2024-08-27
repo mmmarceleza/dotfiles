@@ -7,7 +7,8 @@
 # --------------------------- Path configuration ------------------------------
 path=(
     $path                           # Keep existing PATH entries
-    $HOME/.local/bin                # My local scripts and binaries
+    $HOME/.local/bin                # My local binaries
+    $HOME/.local/bin/scripts        # My local custom scripts
     ${KREW_ROOT:-$HOME/.krew}/bin   # Krew PATH (plugin manager for kubectl)
 )
 typeset -U path                     # Remove duplicate directories
