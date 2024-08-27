@@ -4,8 +4,19 @@
 # Source: http://github.com/mmmmarceleza/dotfiles/.zshrc
 #------------------------------------------------------------------------------
 
+# --------------------------- Path configuration ------------------------------
+path=(
+    $path                           # Keep existing PATH entries
+    $HOME/.local/bin                # My local scripts and binaries
+    ${KREW_ROOT:-$HOME/.krew}/bin   # Krew PATH (plugin manager for kubectl)
+)
+typeset -U path                     # Remove duplicate directories
+path=($^path(N-/))                  # Remove non-existent directories
+export PATH                         # Export new PATH
+# -----------------------------------------------------------------------------
+
 ## Options section
-setopt correct                                                  # Auto correct mistakes
+#setopt correct                                                  # Auto correct mistakes
 setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
 setopt nocaseglob                                               # Case insensitive globbing
 setopt rcexpandparam                                            # Array expension with parameters
@@ -13,6 +24,7 @@ setopt nocheckjobs                                              # Don't warn abo
 setopt numericglobsort                                          # Sort filenames numerically when it makes sense
 setopt nobeep                                                   # No beep
 setopt appendhistory                                            # Immediately append history instead of overwriting
+setopt sharehistory                                             # share history across all zsh instances
 setopt histignorealldups                                        # If a new command is a duplicate, remove the older one
 setopt autocd                                                   # if only directory path is entered, cd there.
 setopt inc_append_history                                       # save commands are added to the history immediately, otherwise only when shell exits.
@@ -30,6 +42,7 @@ HISTFILE=~/.zhistory
 export HISTFILESIZE=999999
 export HISTSIZE=999999
 export SAVEHIST=999999
+export HISTDUP=erase
 
 ## Keybindings section
 bindkey -e
@@ -90,12 +103,6 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 [ -f ~/.shell_functions ] && . ~/.shell_functions
 [ -f ~/.shell_aliases_private ] && . ~/.shell_aliases_private
 [ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
-
-# adding ~/.local/bin in the PATH variable
-[ -d ~/.local/bin ] && export PATH=/home/marcelo/.local/bin:$PATH
-
-# adding Krew folder to the PATH (https://krew.sigs.k8s.io/)
-[ -d ~/.krew/bin ] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 [ $(command -v zoxide) ] && eval "$(zoxide init zsh)" # https://github.com/ajeetdsouza/zoxide
 
