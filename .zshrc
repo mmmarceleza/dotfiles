@@ -123,3 +123,16 @@ else
   git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.zshplugins/zsh-autosuggestions
   source ~/.zshplugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
+
+# install zsh-completions -- https://github.com/zsh-users/zsh-completions
+if [ -d ~/.zshplugins/zsh-completions ]; then
+  source ~/.zshplugins/zsh-completions/zsh-completions.plugin.zsh
+else
+  git clone https://github.com/zsh-users/zsh-completions.git ~/.zshplugins/zsh-completions
+  source ~/.zshplugins/zsh-completions/zsh-completions.plugin.zsh
+fi
+
+## Installed by Autokubectl: https://github.com/caruccio/autokube
+source /home/marcelo/git/getup/getup/autokube/autokubeconfig.sh
+source /home/marcelo/git/getup/getup/autokube/autokubectl.sh
+source /home/marcelo/git/getup/getup/autokube/showkubectl.sh

@@ -20,6 +20,7 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 [ -f ~/.shell_functions ] && . ~/.shell_functions
 [ -f ~/.shell_aliases_private ] && . ~/.shell_aliases_private
 [ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
+[ -f /opt/autokube/autokubectl.sh ] && . /opt/autokube/autokubectl.sh
 
 # adding ~/.local/bin in the PATH variable
 [ -d ~/.local/bin ] && export PATH=/home/marcelo/.local/bin:$PATH
@@ -42,3 +43,7 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 
 # enabling aws-assume-role to work as a function
 [ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0
+## Installed by Autokubectl: https://github.com/caruccio/autokube
+source /home/marcelo/git/getup/getup/autokube/autokubeconfig.sh
+source /home/marcelo/git/getup/getup/autokube/autokubectl.sh
+source /home/marcelo/git/getup/getup/autokube/showkubectl.sh
