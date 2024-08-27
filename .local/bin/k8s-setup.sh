@@ -14,6 +14,7 @@ KREW_PLUGINS=(
   "deprecations"      # https://github.com/kubepug/kubepug 
   "explore"           # https://github.com/keisku/kubectl-explore
   "get-all"           # https://github.com/corneliusweig/ketall
+  "ingress-nginx"     # https://kubernetes.github.io/ingress-nginx/kubectl-plugin/
   "kubescape"         # https://github.com/kubescape/kubescape/
   "marvin"            # https://github.com/undistro/marvin
   "popeye"            # https://popeyecli.io/
@@ -37,6 +38,7 @@ HELM_REPOS=(
   "gitlab               https://charts.gitlab.io"
   "grafana              https://grafana.github.io/helm-charts"
   "harbor               https://helm.goharbor.io"
+  "hashicorp            https://helm.releases.hashicorp.com"
   "ingress-nginx        https://kubernetes.github.io/ingress-nginx"
   "istio                https://istio-release.storage.googleapis.com/charts"
   "jenkins              https://charts.jenkins.io"

@@ -180,6 +180,7 @@ packages=(
     "tree"
     "trivy"
     "ttf-hack-nerd"
+    "ttf-jetbrains-mono-nerd"
     "unzip"
     "vagrant"
     "velero-bin"
@@ -194,6 +195,7 @@ packages=(
     "wireguard-tools"
     "xca"
     "xsel"
+    "yazi"
     "zellij"
     "zoxide"
 )
