@@ -1,6 +1,6 @@
 [Appearance]
 ColorScheme=marcelo-zsh
-Font=Hack Nerd Font,14,-1,5,50,0,0,0,0,0
+Font=JetBrainsMono Nerd Font,14,-1,5,50,0,0,0,0,0
 
 [Cursor Options]
 CursorShape=0
@@ -14,7 +14,7 @@ Parent=FALLBACK/
 [Scrolling]
 HistoryMode=2
 HistorySize=10000
-ScrollFullPage=1
+ScrollFullPage=true
 
 [Terminal Features]
 BlinkingCursorEnabled=true
