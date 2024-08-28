@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Function to display the help message
+show_help() {
+    echo "Usage: $(basename "$0") [OPTION]"
+    echo
+    echo "Options:"
+    echo "  --short          Show only the current cluster, user, and namespace."
+    echo "  -h, --help       Display this help and exit."
+    echo
+    echo "Without any options, this script will display the full context information including certificates."
+}
+
+# Function to get the basic information (cluster, user, and namespace)
+get_short_info() {
+    cluster=$(kubectl config current-context)
+    user=$(kubectl config view --minify -o jsonpath='{.contexts[0].context.user}')
+    namespace=$(kubectl config view --minify -o jsonpath='{..namespace}')
+    echo "Cluster:   $cluster"
+    echo "User:      $user"
+    echo "Namespace: $namespace"
+}
+
+# Function to get the full context information with certificates
+get_full_info() {
+    kubectl config view --minify --raw
+}
+
+# Check the parameter
+case "$1" in
+    --short)
+        get_short_info
+        ;;
+    -h|--help)
+        show_help
+        ;;
+    *)
+        get_full_info
+        ;;
+esac
+
