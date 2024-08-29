@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Get and list all global objects with the quantity 
+echo "--------------------------------------------------------------------------------"
+echo "Global objects (namespaced=false)"
+echo "--------------------------------------------------------------------------------"
+kubectl api-resources --verbs=list -o name --namespaced=false | while read -r kind; do
+  echo -n "$kind: "
+  kubectl get --ignore-not-found -A "$kind" | wc -l
+done 2>/dev/null
+
+# Get and list all namespaced objects with the quantity
+echo "--------------------------------------------------------------------------------"
+echo "Namespaced objects (namespaced=true)"
+echo "--------------------------------------------------------------------------------"
+kubectl api-resources --verbs=list -o name --namespaced=true | while read -r kind; do
+  echo -n "$kind: "
+  kubectl get --ignore-not-found -A "$kind" | wc -l
+done 2>/dev/null
