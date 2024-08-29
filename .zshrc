@@ -140,8 +140,7 @@ else
   git clone https://github.com/zsh-users/zsh-completions.git ~/.zshplugins/zsh-completions
   source ~/.zshplugins/zsh-completions/zsh-completions.plugin.zsh
 fi
-
 ## Installed by Autokubectl: https://github.com/caruccio/autokube
-source /home/marcelo/git/getup/getup/autokube/autokubeconfig.sh
-source /home/marcelo/git/getup/getup/autokube/autokubectl.sh
-source /home/marcelo/git/getup/getup/autokube/showkubectl.sh
+source /opt/autokube/autokubeconfig.sh
+source /opt/autokube/autokubectl.sh
+source /opt/autokube/showkubectl.sh

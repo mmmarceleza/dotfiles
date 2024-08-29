@@ -1,6 +1,7 @@
 # Others
 alias g='git'
 alias git-show-alias='cat $HOME/.gitconfig'
+alias lg='lazygit'
 
 # neovim
 alias n='nvim'
@@ -16,7 +17,7 @@ alias nvimrc="vim ~/.config/nvim"
 alias vimrc="vim ~/.vimrc"
 alias tmuxrc="vim ~/.tmux.conf"
 alias starshiprc="vim ~/.config/starship.toml"
-
+alias dotfiles="vim ~/git/mmmarceleza/github/dotfiles/"
 # cat customization
 [ $(command -v bat) ] && alias cat='bat --decorations=never'
 
@@ -74,7 +75,7 @@ alias k3mdsresource='kubectl get ds -o=custom-columns="DAEMONSET:.metadata.name,
 alias k3mcjresource='kubectl get cj -o=custom-columns="CRONJOB:.metadata.name,NAMESPACE:.metadata.namespace,REQUEST_CPU:.spec.jobTemplate.spec.template.spec.containers[*].resources.requests.cpu,REQUEST_MEM:.spec.jobTemplate.spec.template.spec.containers[*].resources.requests.memory,LIMITS_CPU:.spec.jobTemplate.spec.template.spec.containers[*].resources.limits.cpu,LIMITS_MEM:.spec.jobTemplate.spec.template.spec.containers[*].resources.limits.memory"'
 alias k3mnoderesource='kubectl get nodes -o=custom-columns="NODE:.metadata.name,CPU:.status.capacity.cpu,MEMORY:.status.capacity.memory"'
 alias k3mowner='kubectl get pods -o=custom-columns="PODS:.metadata.name,NAMESPACE:.metadata.namespace,OWNER_NAME:.metadata.ownerReferences[*].name,OWNER_KIND:.metadata.ownerReferences[*].kind"'
-alias kcc='~/git/mmmarceleza/kind/create-cluster.sh'
+alias kcc='~/git/mmmarceleza/github/kind/create-cluster.sh'
 alias kdc='kind delete cluster'
 alias k3mlabelnode="kubectl get nodes -ojson | jq '.items[].metadata | .name,.labels'"
 alias k3mev='kubectl get events --sort-by='{.metadata.creationTimestamp}' | grep -v Normal'

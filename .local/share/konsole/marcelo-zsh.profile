@@ -11,9 +11,13 @@ DimWhenInactive=true
 Name=marcelo-zsh
 Parent=FALLBACK/
 
+[Interaction Options]
+DropUrlsAsText=false
+UnderlineFilesEnabled=true
+
 [Scrolling]
-HistoryMode=2
-HistorySize=10000
+HistoryMode=1
+HistorySize=999999
 ScrollFullPage=true
 
 [Terminal Features]

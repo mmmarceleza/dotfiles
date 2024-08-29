@@ -5,6 +5,22 @@
 # Reference: https://www.gnu.org/software/bash/manual/bash.pdf (September 2022)
 #------------------------------------------------------------------------------
 
+# --------------------------- Path configuration ------------------------------
+# adding ~/.local/bin in the PATH variable
+if [ -d "$HOME/.local/bin" ] && [ "${PATH#*"$HOME"/.local/bin}" == "$PATH" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+# adding ~/.local/bin/scripts in the PATH variable
+if [ -d "$HOME/.local/bin/scripts" ] && [ "${PATH#*"$HOME"/.local/bin/scripts}" == "$PATH" ]; then
+    export PATH="$HOME/.local/bin/scripts:$PATH"
+fi
+# adding Krew folder to the PATH (https://krew.sigs.k8s.io/)
+if [ -d "$HOME/.krew/bin" ] && [ "${PATH#*"$HOME"/.krew/bin}" == "$PATH" ]; then
+    export PATH="$HOME/.krew/bin:$PATH"
+fi
+# -----------------------------------------------------------------------------
+
+
 # Bash Variables
 export HISTFILESIZE=999999
 export HISTSIZE=999999
@@ -23,11 +39,6 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 [ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
 [ -f /opt/autokube/autokubectl.sh ] && . /opt/autokube/autokubectl.sh
 
-# adding ~/.local/bin in the PATH variable
-[ -d ~/.local/bin ] && export PATH=/home/marcelo/.local/bin:$PATH
-
-# adding Krew folder to the PATH (https://krew.sigs.k8s.io/)
-[ -d ~/.krew/bin ] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # enabling zoxide
 [ $(command -v zoxide) ] && eval "$(zoxide init bash)" # https://github.com/ajeetdsouza/zoxide
@@ -45,6 +56,6 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 # enabling aws-assume-role to work as a function
 [ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0
 ## Installed by Autokubectl: https://github.com/caruccio/autokube
-source /home/marcelo/git/getup/getup/autokube/autokubeconfig.sh
-source /home/marcelo/git/getup/getup/autokube/autokubectl.sh
-source /home/marcelo/git/getup/getup/autokube/showkubectl.sh
+# source /home/marcelo/git/getup/getup/autokube/autokubeconfig.sh
+# source /home/marcelo/git/getup/getup/autokube/autokubectl.sh
+# source /home/marcelo/git/getup/getup/autokube/showkubectl.sh
