@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# References:
+# https://kubernetes.io/docs/reference/kubectl/#examples-creating-and-using-plugins
+
 # Function to display the help message
 show_help() {
     echo "Usage: $(basename "$0") [OPTION]"
