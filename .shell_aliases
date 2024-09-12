@@ -11,13 +11,17 @@ alias n='nvim'
 alias zshrc="vim ~/.zshrc"
 alias bashrc="vim ~/.bashrc"
 alias aliasrc="vim ~/.shell_aliases"
+alias aliasprc="vim ~/.shell_aliases_private"
+alias functionrc="vim ~/.shell_functions"
+alias functionprc="vim ~/.shell_functions_private"
 alias zshrcs="source ~/.zshrc"
 alias bashrcs="source ~/.bashrc"
 alias nvimrc="vim ~/.config/nvim"
 alias vimrc="vim ~/.vimrc"
 alias tmuxrc="vim ~/.tmux.conf"
 alias starshiprc="vim ~/.config/starship.toml"
-alias dotfiles="vim ~/git/mmmarceleza/github/dotfiles/"
+alias dot="vim ~/git/mmmarceleza/github/dotfiles/"
+alias dotp="vim ~/git/mmmarceleza/github/dotfiles-private/"
 # cat customization
 [ $(command -v bat) ] && alias cat='bat --decorations=never'
 
@@ -65,7 +69,8 @@ alias redis-cli='docker run --rm --network=host redis:alpine redis-cli'
 alias shellcheck='docker run -v $(pwd):/mnt koalaman/shellcheck --color=always'
 
 # Personal Kubernetes 
-
+alias kc='kubectx'
+alias kn='kubens'
 alias k3mtaint='kubectl get nodes -o=custom-columns="NODE:.metadata.name,TAINTS:.spec.taints"'
 alias k3mimage='kubectl get pods -o=custom-columns="PODS:.metadata.name,IMAGES:.spec.containers[*].image"'
 alias k3mpodresource='kubectl get pods -o=custom-columns="PODS:.metadata.name,NAMESPACE:.metadata.namespace,"REQUEST_CPU:".spec.containers[*].resources.requests.cpu,"REQUEST_MEM:".spec.containers[*].resources.requests.memory,"LIMITS_CPU:".spec.containers[*].resources.limits.cpu,"LIMITS_MEM:".spec.containers[*].resources.limits.memory"'

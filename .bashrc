@@ -20,26 +20,24 @@ if [ -d "$HOME/.krew/bin" ] && [ "${PATH#*"$HOME"/.krew/bin}" == "$PATH" ]; then
 fi
 # -----------------------------------------------------------------------------
 
-
-# Bash Variables
+# --------------------------- History configuration ---------------------------
 export HISTFILESIZE=999999
 export HISTSIZE=999999
-# Don't record some commands
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
-# A colon-separated list of values controlling how commands are saved on the history list
 HISTCONTROL="erasedups:ignoreboth"
+# -----------------------------------------------------------------------------
 
-# Set default editor to nvim if available, otherwise vim
-export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2>/dev/null
-
-# importing my aliases and fuctions
+# ---------------------------- Aliases and functions --------------------------
 [ -f ~/.shell_aliases ] && . ~/.shell_aliases
 [ -f ~/.shell_functions ] && . ~/.shell_functions
 [ -f ~/.shell_aliases_private ] && . ~/.shell_aliases_private
 [ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
-[ -f /opt/autokube/autokubectl.sh ] && . /opt/autokube/autokubectl.sh
+# -----------------------------------------------------------------------------
 
-
+# ------------------------------ Other settings -------------------------------
+# Set default editor to nvim if available, otherwise vim
+export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2>/dev/null
+#
 # enabling zoxide
 [ $(command -v zoxide) ] && eval "$(zoxide init bash)" # https://github.com/ajeetdsouza/zoxide
 
@@ -55,7 +53,11 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 
 # enabling aws-assume-role to work as a function
 [ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0
+# -----------------------------------------------------------------------------
+
+# --------------------------------- Autokube ----------------------------------
 ## Installed by Autokubectl: https://github.com/caruccio/autokube
-# source /home/marcelo/git/getup/getup/autokube/autokubeconfig.sh
-# source /home/marcelo/git/getup/getup/autokube/autokubectl.sh
-# source /home/marcelo/git/getup/getup/autokube/showkubectl.sh
+[ -f /opt/autokube/autokubeconfig.sh ] && . /opt/autokube/autokubeconfig.sh
+[ -f /opt/autokube/autokubectl.sh ] && . /opt/autokube/autokubectl.sh
+[ -f /opt/autokube/showkubectl.sh ] && . /opt/autokube/showkubectl.sh
+# -----------------------------------------------------------------------------

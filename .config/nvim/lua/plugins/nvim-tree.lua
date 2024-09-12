@@ -123,6 +123,17 @@ nvim_tree.setup({
 	},
 	renderer = {
 		root_folder_modifier = ":t",
+		indent_markers = {
+			enable = true,
+			inline_arrows = true,
+			icons = {
+				corner = "└",
+				edge = "│",
+				item = "│",
+				bottom = "─",
+				none = " ",
+			},
+		},
 		icons = {
 			glyphs = {
 				default = "",
@@ -150,7 +161,8 @@ nvim_tree.setup({
 		},
 	},
 	filters = {
-		dotfiles = true,
+		dotfiles = false,
+		git_ignored = false,
 	},
 	diagnostics = {
 		enable = true,

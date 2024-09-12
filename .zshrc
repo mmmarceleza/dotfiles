@@ -17,106 +17,80 @@ path=($^path(N-/))                  # Remove non-existent directories
 export PATH                         # Export new PATH
 # -----------------------------------------------------------------------------
 
-## Options section
-#setopt correct                                                  # Auto correct mistakes
-setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
-setopt nocaseglob                                               # Case insensitive globbing
-setopt rcexpandparam                                            # Array expension with parameters
-setopt nocheckjobs                                              # Don't warn about running processes when exiting
-setopt numericglobsort                                          # Sort filenames numerically when it makes sense
-setopt nobeep                                                   # No beep
-setopt appendhistory                                            # Immediately append history instead of overwriting
-setopt sharehistory                                             # share history across all zsh instances
-setopt histignorealldups                                        # If a new command is a duplicate, remove the older one
-setopt autocd                                                   # if only directory path is entered, cd there.
-setopt inc_append_history                                       # save commands are added to the history immediately, otherwise only when shell exits.
-setopt histignorespace                                          # Don't save commands that start with space
+# --------------------------- History configuration ---------------------------
+HISTFILE=~/.zhistory        # Historry file location
+export HISTSIZE=999999      # The maximum number of events stored in the internal history list
+export SAVEHIST=999999      # The maximum number of history events to save in the history file
+setopt appendhistory        # Immediately append history instead of overwriting
+setopt sharehistory         # share history across all zsh instances
+setopt histignorealldups    # If a new command is a duplicate, remove the older one
+setopt inc_append_history   # save commands are added to the history immediately, otherwise only when shell exits.
+setopt histignorespace      # Don't save commands that start with space
+# -----------------------------------------------------------------------------
 
-zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' # Case insensitive tab completion
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"         # Colored completion (different colors for dirs/files/etc)
-zstyle ':completion:*' rehash true                              # automatically find new executables in path 
-zstyle ':completion:*' menu select                              # Highlight menu selection
-# Speed up completions
-zstyle ':completion:*' accept-exact '*(N)'
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ~/.zsh/cache
-HISTFILE=~/.zhistory
-export HISTFILESIZE=999999
-export HISTSIZE=999999
-export SAVEHIST=999999
-export HISTDUP=erase
+# ------------------------ Others Options configuration -----------------------
+setopt extendedglob         # Extended globbing. Allows using regular expressions with *
+setopt nocaseglob           # Case insensitive globbing
+setopt rcexpandparam        # Array expension with parameters
+setopt nocheckjobs          # Don't warn about running processes when exiting
+setopt numericglobsort      # Sort filenames numerically when it makes sense
+setopt nobeep               # No beep
+setopt autocd               # if only directory path is entered, cd there.
+# -----------------------------------------------------------------------------
 
-## Keybindings section
-bindkey -e
-bindkey '^[[7~' beginning-of-line                               # Home key
-bindkey '^[[H' beginning-of-line                                # Home key
-if [[ "${terminfo[khome]}" != "" ]]; then
-  bindkey "${terminfo[khome]}" beginning-of-line                # [Home] - Go to beginning of line
-fi
-bindkey '^[[8~' end-of-line                                     # End key
-bindkey '^[[F' end-of-line                                     # End key
-if [[ "${terminfo[kend]}" != "" ]]; then
-  bindkey "${terminfo[kend]}" end-of-line                       # [End] - Go to end of line
-fi
-bindkey '^[[2~' overwrite-mode                                  # Insert key
-bindkey '^[[3~' delete-char                                     # Delete key
-bindkey '^[[C'  forward-char                                    # Right key
-bindkey '^[[D'  backward-char                                   # Left key
-bindkey '^[[5~' history-beginning-search-backward               # Page up key
-bindkey '^[[6~' history-beginning-search-forward                # Page down key
+# --------------------------- Keybindings configuration -----------------------
+bindkey -e                                         # Use Emacs keybindings
+bindkey '^[[5~' history-beginning-search-backward  # Page Up key - Search history backward from current input
+bindkey '^[[6~' history-beginning-search-forward   # Page Down key - Search history forward from current input
+# -----------------------------------------------------------------------------
 
-# Navigate words with ctrl+arrow keys
-bindkey '^[Oc' forward-word                                     #
-bindkey '^[Od' backward-word                                    #
-bindkey '^[[1;5D' backward-word                                 #
-bindkey '^[[1;5C' forward-word                                  #
-bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
-bindkey '^[[Z' undo                                             # Shift+tab undo last action
+# ------------------------ Completion Configuration ------------------------
+# Case insensitive tab completion (matches both lower and upper case)
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'  
 
-# Theming section  
+# Use colored completion (different colors for directories, files, etc.) based on LS_COLORS
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"         
+
+# Automatically detect new executables in the PATH for autocompletion without needing to restart the shell
+zstyle ':completion:*' rehash true                              
+
+# Enable menu selection in autocompletion, allowing highlighted selection with arrow keys
+zstyle ':completion:*' menu select                              
+
+# Accept exact matches, even if they are not readable (speeds up completion)
+zstyle ':completion:*' accept-exact '*(N)'                      
+
+# Enable caching for faster autocompletion
+zstyle ':completion:*' use-cache on                             
+
+# Define the cache directory for storing autocompletion data
+zstyle ':completion:*' cache-path ~/.zsh/cache                  
+# -----------------------------------------------------------------------------
+
+# ------------------------- Autoload and Initialization -------------------------
 autoload -U compinit colors zcalc
+# Autoload functions for completion initialization, color support, and calculator
+# - `compinit`: Initializes the completion system
+# - `colors`: Enables color support in the terminal
+# - `zcalc`: Provides a built-in calculator function
+
 compinit -d
+# Initialize the completion system and create a cache for completion data
+# The `-d` option specifies that the cache should be saved in the default directory (`~/.zcompdump`)
+
 colors
-# Color man pages
-export LESS_TERMCAP_mb=$'\E[01;32m'
-export LESS_TERMCAP_md=$'\E[01;32m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;47;34m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;36m'
-export LESS=-R
+# Activate color support in the terminal
+# Allows the use of color variables for customizing output appearance
+# -----------------------------------------------------------------------------
 
-## Plugins section: Enable fish style features
-# Use syntax highlighting
-#source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# Use history substring search
-#source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
-# bind UP and DOWN arrow keys to history substring search
-
-# Set default editor to nvim if available, otherwise vim
-export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2>/dev/null
-
-# enabling starship
-[ $(command -v starship) ] && eval "$(starship init zsh)" # https://starship.rs/
-
-# importing my aliases and fuctions
+# ---------------------------- Aliases and functions --------------------------
 [ -f ~/.shell_aliases ] && . ~/.shell_aliases
 [ -f ~/.shell_functions ] && . ~/.shell_functions
 [ -f ~/.shell_aliases_private ] && . ~/.shell_aliases_private
 [ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
+# -----------------------------------------------------------------------------
 
-[ $(command -v zoxide) ] && eval "$(zoxide init zsh)" # https://github.com/ajeetdsouza/zoxide
-
-# autocompletion for kubectl
-[ $(command -v kubectl) ] && source <(kubectl completion zsh) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
-
-# autocompletion for flux
-[ $(command -v flux) ] && source <(flux completion zsh) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
-
-# enabling aws-assume-role to work as a function
-[ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0
-
+# --------------------------- Plugins configuration ---------------------------
 # install zsh-syntax-highlighting -- https://github.com/zsh-users/zsh-syntax-highlighting
 if [ -d ~/.zshplugins/zsh-syntax-highlighting ]; then
   source ~/.zshplugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -132,6 +106,7 @@ else
   git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.zshplugins/zsh-autosuggestions
   source ~/.zshplugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
+bindkey '^ ' autosuggest-accept # bind ctrl + space to accept the current suggestion.
 
 # install zsh-completions -- https://github.com/zsh-users/zsh-completions
 if [ -d ~/.zshplugins/zsh-completions ]; then
@@ -140,7 +115,33 @@ else
   git clone https://github.com/zsh-users/zsh-completions.git ~/.zshplugins/zsh-completions
   source ~/.zshplugins/zsh-completions/zsh-completions.plugin.zsh
 fi
+# -----------------------------------------------------------------------------
+
+# ------------------------------ Other settings -------------------------------
+# Set default editor to nvim if available, otherwise vim
+export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2>/dev/null
+
+# Enabling starship
+[ $(command -v starship) ] && eval "$(starship init zsh)" # https://starship.rs/
+
+# Enabling zoxide
+[ $(command -v zoxide) ] && eval "$(zoxide init zsh)" # https://github.com/ajeetdsouza/zoxide
+
+# autocompletion for kubectl
+[ $(command -v kubectl) ] && source <(kubectl completion zsh) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+
+# autocompletion for flux
+[ $(command -v flux) ] && source <(flux completion zsh) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+
+# enabling aws-assume-role to work as a function
+[ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0
+# -----------------------------------------------------------------------------
+
+# --------------------------------- Autokube ----------------------------------
 ## Installed by Autokubectl: https://github.com/caruccio/autokube
-source /opt/autokube/autokubeconfig.sh
-source /opt/autokube/autokubectl.sh
-source /opt/autokube/showkubectl.sh
+[ -f /opt/autokube/autokubeconfig.sh ] && . /opt/autokube/autokubeconfig.sh
+[ -f /opt/autokube/autokubectl.sh ] && . /opt/autokube/autokubectl.sh
+[ -f /opt/autokube/showkubectl.sh ] && . /opt/autokube/showkubectl.sh
+# -----------------------------------------------------------------------------
+
+
