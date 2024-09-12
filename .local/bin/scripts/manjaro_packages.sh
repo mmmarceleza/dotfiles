@@ -105,7 +105,6 @@ fi
 packages=(
     "actionlint"
     "arogcd"
-    "authy"
     "aws-cli-v2"
     "base-devel"
     "bash-completion"

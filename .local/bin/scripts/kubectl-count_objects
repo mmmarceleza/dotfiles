@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# References:
+# https://kubernetes.io/docs/reference/kubectl/#examples-creating-and-using-plugins
+
 # Get and list all global objects with the quantity 
 echo "--------------------------------------------------------------------------------"
 echo "Global objects (namespaced=false)"
