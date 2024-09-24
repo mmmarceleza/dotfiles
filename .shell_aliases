@@ -3,8 +3,9 @@ alias g='git'
 alias git-show-alias='cat $HOME/.gitconfig'
 alias lg='lazygit'
 
-# neovim
+# applications
 alias n='nvim'
+alias t='tmux'
 
 # some configurations
 [ $(command -v nvim) ] && alias vim="nvim"

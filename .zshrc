@@ -40,8 +40,34 @@ setopt autocd               # if only directory path is entered, cd there.
 
 # --------------------------- Keybindings configuration -----------------------
 bindkey -e                                         # Use Emacs keybindings
+
+# Home key bindings for different terminal types
+bindkey '^[[7~' beginning-of-line                   # Home key (variant 1) - Move cursor to the beginning of the line
+bindkey '^[[H' beginning-of-line                    # Home key (variant 2) - Move cursor to the beginning of the line
+if [[ "${terminfo[khome]}" != "" ]]; then
+  bindkey "${terminfo[khome]}" beginning-of-line    # Home key based on terminfo - Move to beginning of line
+fi
+
+# End key bindings for different terminal types
+bindkey '^[[8~' end-of-line                        # End key (variant 1) - Move cursor to the end of the line
+bindkey '^[[F' end-of-line                         # End key (variant 2) - Move cursor to the end of the line
+if [[ "${terminfo[kend]}" != "" ]]; then
+  bindkey "${terminfo[kend]}" end-of-line          # End key based on terminfo - Move to end of line
+fi
+
+# Other useful key bindings
+bindkey '^[[2~' overwrite-mode                     # Insert key - Toggle overwrite mode
+bindkey '^[[3~' delete-char                        # Delete key - Delete the character under the cursor
+bindkey '^[[C'  forward-char                       # Right arrow key - Move cursor forward by one character
+bindkey '^[[D'  backward-char                      # Left arrow key - Move cursor backward by one character
 bindkey '^[[5~' history-beginning-search-backward  # Page Up key - Search history backward from current input
 bindkey '^[[6~' history-beginning-search-forward   # Page Down key - Search history forward from current input
+bindkey '^[Oc' forward-word                        # Alt + Right Arrow - Move forward by one word
+bindkey '^[Od' backward-word                       # Alt + Left Arrow - Move backward by one word
+bindkey '^[[1;5D' backward-word                    # Ctrl + Left Arrow - Move cursor back by one word
+bindkey '^[[1;5C' forward-word                     # Ctrl + Right Arrow - Move cursor forward by one word
+bindkey '^H' backward-kill-word                    # Ctrl + Backspace - Delete the word before the cursor
+bindkey '^[[Z' undo                                # Shift + Tab - Undo last change
 # -----------------------------------------------------------------------------
 
 # ------------------------ Completion Configuration ------------------------
@@ -54,8 +80,8 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 # Automatically detect new executables in the PATH for autocompletion without needing to restart the shell
 zstyle ':completion:*' rehash true                              
 
-# Enable menu selection in autocompletion, allowing highlighted selection with arrow keys
-zstyle ':completion:*' menu select                              
+# force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
+zstyle ':completion:*' menu no
 
 # Accept exact matches, even if they are not readable (speeds up completion)
 zstyle ':completion:*' accept-exact '*(N)'                      
@@ -64,7 +90,32 @@ zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on                             
 
 # Define the cache directory for storing autocompletion data
-zstyle ':completion:*' cache-path ~/.zsh/cache                  
+zstyle ':completion:*' cache-path ~/.zsh/cache
+
+# disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+
+# set descriptions format to enable group support
+# NOTE: don't use escape sequences here, fzf-tab will ignore them
+zstyle ':completion:*:descriptions' format '[%d]'
+
+# show systemd unit status
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
+
+# switch group using `<` and `>`
+zstyle ':fzf-tab:*' switch-group '<' '>'
+
+# script ftb-tmux-popup to make full use of it's "popup" feature
+zstyle ':fzf-tab:*' popup-min-size 180 12
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+
+# preview directory's and file's content
+zstyle ':fzf-tab:complete:*:*' fzf-preview 'less ${(Q)realpath}'
+export LESSOPEN='|/home/marcelo/.local/bin/scripts/lessfilter %s'
+zstyle ':fzf-tab:complete:*:options' fzf-preview 
+zstyle ':fzf-tab:complete:*:argument-1' fzf-preview
+
+zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'echo ${(P)word}'
 # -----------------------------------------------------------------------------
 
 # ------------------------- Autoload and Initialization -------------------------
@@ -91,6 +142,14 @@ colors
 # -----------------------------------------------------------------------------
 
 # --------------------------- Plugins configuration ---------------------------
+# install fzf-tab -- https://github.com/Aloxaf/fzf-tab
+if [ -d ~/.zshplugins/fzf-tab ]; then
+  source ~/.zshplugins/fzf-tab/fzf-tab.plugin.zsh
+else
+  git clone  https://github.com/Aloxaf/fzf-tab.git ~/.zshplugins/fzf-tab
+  source ~/.zshplugins/fzf-tab/fzf-tab.plugin.zsh
+fi
+
 # install zsh-syntax-highlighting -- https://github.com/zsh-users/zsh-syntax-highlighting
 if [ -d ~/.zshplugins/zsh-syntax-highlighting ]; then
   source ~/.zshplugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
