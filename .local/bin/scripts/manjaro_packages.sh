@@ -112,12 +112,14 @@ packages=(
     "brave-browser"
     "btop"
     "buildah"
+    "chafa"
     "cosign"
     "crane"
     "discord"
     "dive"
     "docker"
     "docker-compose"
+    "eza"
     "fd"
     "fzf"
     "git-delta"
@@ -144,10 +146,12 @@ packages=(
     "kubeval-bin"
     "kustomize"
     "lazygit"
+    "lesspipe.sh"
     "libreoffice-fresh"
     "libreoffice-fresh-pt-br"
     "lsd"
     "make"
+    "mediainfo"
     "meld"
     "mtr"
     "neovim"
@@ -157,6 +161,7 @@ packages=(
     "openfortivpn"
     # "paru-bin"
     "peek"
+    "perl-image-exiftool"
     "podman"
     "python-pip"
     "qbittorrent"
@@ -201,7 +206,6 @@ packages=(
 
 # List of packages to install from Flathub (https://flathub.org/)
 flatpak_packages=(
-    "com.github.KRTirtho.Spotube"
     "com.jgraph.drawio.desktop"
     "com.obsproject.Studio"
     "com.slack.Slack"
@@ -216,10 +220,10 @@ flatpak_packages=(
 )
 
 # List of appimage packages to install
-appimage_packages=(
-    "emulationstation-de:https://gitlab.com/es-de/emulationstation-de/-/package_files/117882100/download"
-    # "url package-name"
-)
+# appimage_packages=(
+#     "emulationstation-de:https://gitlab.com/es-de/emulationstation-de/-/package_files/117882100/download"
+#     # "url package-name"
+# )
 
 # List of python packages to install
 python_packages=(
@@ -238,25 +242,25 @@ title "Installing flatpak packages"
 require_package flatpak
 flatpak install flathub -y "${flatpak_packages[@]}" || abort "Error installing flatpak package"
 
-# Create the directory to install appimage packages, if it doesn't exist
-title "Installing AppImage packages"
-app_dir=$USER_HOME/Applications
-mkdir -p "$app_dir" || abort "failed in creating of $app_dir"
-
-for pkg in "${appimage_packages[@]}"; do
-    # Split the package entry into URL and custom name
-    url=${pkg#*:}
-    name=${pkg%%:*}
-
-    path="$app_dir/$name"
-
-    if [ -e "$path" ]; then
-        echo "$name is already installed."
-    else
-        echo "Installing $name from $url..."
-        wget -O "$path" "$url" && chmod +x "$path" || abort "Error installing $name"
-    fi
-done
+# # Create the directory to install appimage packages, if it doesn't exist
+# title "Installing AppImage packages"
+# app_dir=$USER_HOME/Applications
+# mkdir -p "$app_dir" || abort "failed in creating of $app_dir"
+#
+# for pkg in "${appimage_packages[@]}"; do
+#     # Split the package entry into URL and custom name
+#     url=${pkg#*:}
+#     name=${pkg%%:*}
+#
+#     path="$app_dir/$name"
+#
+#     if [ -e "$path" ]; then
+#         echo "$name is already installed."
+#     else
+#         echo "Installing $name from $url..."
+#         wget -O "$path" "$url" && chmod +x "$path" || abort "Error installing $name"
+#     fi
+# done
 
 # installing python packges
 title "Installing python packages"

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# References:
+# https://git-scm.com/docs/git-clone#Documentation/git-clone.txt-code--barecode
+
 git clone --bare https://github.com/mmmarceleza/dotfiles.git "$HOME"/.dotfiles
 function config {
    /usr/bin/git --git-dir="$HOME"/.dotfiles/ --work-tree="$HOME" "$@"
