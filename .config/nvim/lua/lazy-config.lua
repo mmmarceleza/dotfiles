@@ -33,7 +33,7 @@ require("lazy").setup({
 	-----------------------------------------
 	{
 		"akinsho/bufferline.nvim", -- https://github.com/akinsho/bufferline.nvim
-		version = "v4.4.0",
+		version = "v4.7.0",
 		dependencies = "nvim-tree/nvim-web-devicons",
 	},
 
@@ -41,7 +41,7 @@ require("lazy").setup({
 	-- Indentation guides
 	---------------------
 	{
-		"lukas-reineke/indent-blankline.nvim", -- https://github.com/luka-s-reineke/indent-blankline.nvim
+		"lukas-reineke/indent-blankline.nvim", -- https://github.com/lukas-reineke/indent-blankline.nvim
 		main = "ibl",
 		opts = {},
 	},
@@ -155,61 +155,72 @@ require("lazy").setup({
 	{
 		"folke/which-key.nvim", -- https://github.com/folke/which-key.nvim
 		event = "VeryLazy",
-		init = function()
-			vim.o.timeout = true
-			vim.o.timeoutlen = 300
-		end,
-	},
 
-	------------
-	-- Formatter
-	------------
-	{
-		"stevearc/conform.nvim", -- https://github.com/stevearc/conform.nvim
-		lazy = true,
-		event = { "BufReadPre", "BufNewFile" },
-	},
-
-	----------
-	-- Linters
-	----------
-	{
-		"mfussenegger/nvim-lint", -- https://github.com/mfussenegger/nvim-lint
-		lazy = true,
-		event = { "BufReadPre", "BufNewFile" },
-	},
-
-	-----------------------------
-	-- Package Manager for Neovim
-	-----------------------------
-	{
-		"williamboman/mason.nvim", -- https://github.com/williamboman/mason.nvim
-		dependencies = {
-			"williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
-			"WhoIsSethDaniel/mason-tool-installer.nvim", -- https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim
+		keys = {
+			{
+				"<leader>?",
+				function()
+					require("which-key").show({ global = false })
+				end,
+				desc = "Buffer Local Keymaps (which-key)",
+			},
 		},
-	},
 
-	----------------------------------------
-	-- Improve the default vim.ui interfaces
-	----------------------------------------
-	"stevearc/dressing.nvim", -- https://github.com/stevearc/dressing.nvim
+		------------
+		-- Formatter
+		------------
+		{
+			"stevearc/conform.nvim", -- https://github.com/stevearc/conform.nvim
+			lazy = true,
+			event = { "BufReadPre", "BufNewFile" },
+		},
 
-	----------------------------------------
-	-- Vim syntax for helm templates
-	----------------------------------------
-	"towolf/vim-helm",
+		----------
+		-- Linters
+		----------
+		{
+			"mfussenegger/nvim-lint", -- https://github.com/mfussenegger/nvim-lint
+			lazy = true,
+			event = { "BufReadPre", "BufNewFile" },
+		},
 
-	----------------------------------------
-	-- Markdown Preview for (Neo)vim
-	----------------------------------------
-	{
-		"iamcco/markdown-preview.nvim",
-		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-		ft = { "markdown" },
-		build = function()
-			vim.fn["mkdp#util#install"]()
-		end,
+		-----------------------------
+		-- Package Manager for Neovim
+		-----------------------------
+		{
+			"williamboman/mason.nvim", -- https://github.com/williamboman/mason.nvim
+			dependencies = {
+				"williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
+				"WhoIsSethDaniel/mason-tool-installer.nvim", -- https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim
+			},
+		},
+
+		----------------------------------------
+		-- Improve the default vim.ui interfaces
+		----------------------------------------
+		"stevearc/dressing.nvim", -- https://github.com/stevearc/dressing.nvim
+
+		----------------------------------------
+		-- Vim syntax for helm templates
+		----------------------------------------
+		"towolf/vim-helm", -- https://github.com/towolf/vim-helm
+
+		----------------------------------------
+		-- Markdown Preview for (Neo)vim
+		----------------------------------------
+		{
+			"iamcco/markdown-preview.nvim", -- https://github.com/iamcco/markdown-preview.nvim
+			cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+			ft = { "markdown" },
+			build = function()
+				vim.fn["mkdp#util#install"]()
+			end,
+		},
+
+		----------------------------------------
+		-- Icon provider
+		----------------------------------------
+		{ "echasnovski/mini.icons", version = false }, -- https://github.com/echasnovski/mini.icons
 	},
 })
 

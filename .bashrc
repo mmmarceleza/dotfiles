@@ -18,6 +18,10 @@ fi
 if [ -d "$HOME/.krew/bin" ] && [ "${PATH#*"$HOME"/.krew/bin}" == "$PATH" ]; then
     export PATH="$HOME/.krew/bin:$PATH"
 fi
+# adding Applications folder to the PATH (appimage default application folder)
+if [ -d "$HOME/Applications" ] && [ "${PATH#*"$HOME"/Applications}" == "$PATH" ]; then
+    export PATH="$HOME/Applications:$PATH"
+fi
 # -----------------------------------------------------------------------------
 
 # --------------------------- History configuration ---------------------------

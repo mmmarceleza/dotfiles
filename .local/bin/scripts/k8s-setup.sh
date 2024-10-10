@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Teleport client version to download
-TELEPORT_VERSION="v14.1.3"
+# TELEPORT_VERSION="14.3.32"
 
 # Default path to download binaries (it is listed in the .gitignore)
 BIN_DIR="$HOME/.local/bin/download-binaries"
@@ -85,11 +85,11 @@ for plugin in "${KREW_PLUGINS[@]}"; do
 done
 
 # Installing Teleport client
-if [[ "$(tsh version | awk '{printf $2; sub(/v/, "")}')" = "$TELEPORT_VERSION" ]]; then
-  echo "Teleport client already installed"
-else
-  curl https://goteleport.com/static/install.sh | bash -s "$TELEPORT_VERSION"
-fi
+# if [[ "$(tsh version | awk '{printf $2; sub(/v/, "")}')" = "$TELEPORT_VERSION" ]]; then
+#   echo "Teleport client already installed"
+# else
+#   curl https://goteleport.com/static/install.sh | bash -s "$TELEPORT_VERSION"
+# fi
 
 # Installing some helm repositories
 for repo in "${HELM_REPOS[@]}"; do

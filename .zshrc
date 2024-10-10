@@ -11,6 +11,7 @@ path=(
     $HOME/.local/bin                # My local binaries
     $HOME/.local/bin/scripts        # My local custom scripts
     ${KREW_ROOT:-$HOME/.krew}/bin   # Krew PATH (plugin manager for kubectl)
+    $HOME/Applications              # AppImage default folder
 )
 typeset -U path                     # Remove duplicate directories
 path=($^path(N-/))                  # Remove non-existent directories

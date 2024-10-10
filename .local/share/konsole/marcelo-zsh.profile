@@ -1,6 +1,9 @@
 [Appearance]
+BorderWhenActive=false
 ColorScheme=marcelo-zsh
+FocusBorderColor=0,0,0
 Font=JetBrainsMono Nerd Font,14,-1,5,50,0,0,0,0,0
+TabColor=24,25,29,0
 
 [Cursor Options]
 CursorShape=0
@@ -8,8 +11,11 @@ CursorShape=0
 [General]
 Command=/bin/zsh
 DimWhenInactive=true
+InvertSelectionColors=false
 Name=marcelo-zsh
 Parent=FALLBACK/
+TerminalCenter=false
+TerminalMargin=1
 
 [Interaction Options]
 DropUrlsAsText=false
