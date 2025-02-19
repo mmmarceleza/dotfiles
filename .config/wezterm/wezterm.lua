@@ -23,6 +23,16 @@ config.tab_max_width = 32
 config.window_decorations = "RESIZE"
 config.hide_mouse_cursor_when_typing = false
 config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
-config.inactive_pane_hsb = { saturation = 0.1, brightness = 0.5 }
+-- config.inactive_pane_hsb = { saturation = 0.1, brightness = 0.5 }
+config.audible_bell = "Disabled"
+config.visual_bell = {
+  fade_in_function = 'EaseIn',
+  fade_in_duration_ms = 150,
+  fade_out_function = 'EaseOut',
+  fade_out_duration_ms = 150,
+}
+config.colors = {
+  visual_bell = '#202020',
+}
 
 return config

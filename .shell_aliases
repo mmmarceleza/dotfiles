@@ -56,6 +56,10 @@ fi
 # git TODO
 #alias cb='git branch --sort=-committerdate | fzf --header "Checkout Recent Branch" --preview "git diff {1} --color=always" --pointer="" | xargs git checkout'
 
+# GH aliases
+# alias myprs='gh search prs --assignee=@me --state=open'
+# alias mylastcommits='gh search commits --author=mmmarceleza --author-date=">$(date --date='-30 days' +"%Y-%m-%d")"'
+
 # alias to manage my dotfiles -- https://github.com/mmmarceleza/dotfiles
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
@@ -109,10 +113,44 @@ alias frsh='flux reconcile source helm'
 alias frsgc='flux reconcile source git cluster'
 alias frkc='flux reconcile kustomization cluster'
 
+# application (argocd)
+alias kgapp='kubectl get application'
+alias kgappsl='kubectl get application --show-labels'
+alias kdapp='kubectl describe application'
+alias kdappn='kubectl describe application --namespace'
+alias kgappall='kubectl get application --all-namespaces'
+alias kgappn='kubectl get application --namespace'
+alias kgappoyamln='kubectl get application -o=yaml --namespace'
+alias kgappoyaml='kubectl get application -o=yaml'
+alias krmapp='kubectl delete application'
+
+# servicemonitor
+alias kgsm='kubectl get servicemonitor'
+alias kgsmsl='kubectl get servicemonitor --show-labels'
+alias kdsm='kubectl describe servicemonitor'
+alias kdsmn='kubectl describe servicemonitor --namespace'
+alias kgsmall='kubectl get servicemonitor --all-namespaces'
+alias kgsmallw='watch kubectl get servicemonitor --all-namespaces'
+alias kgsmn='kubectl get servicemonitor --namespace'
+alias kgsmoyamln='kubectl get servicemonitor -o=yaml --namespace'
+alias kgsmoyaml='kubectl get servicemonitor -o=yaml'
+alias krmsm='kubectl delete servicemonitor'
+
+# service account
+alias kgsa='kubectl get serviceaccount'
+alias kgsasl='kubectl get serviceaccount --show-labels'
+alias kdsa='kubectl describe serviceaccount'
+alias kdsan='kubectl describe serviceaccount --namespace'
+alias kgsaall='kubectl get serviceaccount --all-namespaces'
+alias kgsan='kubectl get serviceaccount --namespace'
+alias kgsaoyamln='kubectl get serviceaccount -o=yaml --namespace'
+alias kgsaoyaml='kubectl get serviceaccount -o=yaml'
+alias krmsa='kubectl delete serviceaccount'
 
 # Common Kubernetes
 # reference: https://github.com/ahmetb/kubectl-aliases
 
+# alias kubectl='kubecolor'
 alias k='kubectl'
 alias ksys='kubectl --namespace=kube-system'
 alias ka='kubectl apply --recursive -f'

@@ -13,6 +13,7 @@
   done = !git push origin main
   pl   = !git pull origin main
   d    = diff
+  sw   = switch
 [core]
   editor = vim
   pager = delta

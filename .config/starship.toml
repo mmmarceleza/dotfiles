@@ -12,7 +12,7 @@ $rust\
 $golang\
 $php\
 [](fg:#212736 bg:#1d2230)\
-$aws\
+$gcloud\
 [](fg:#212736 bg:#1d2230)\
 $kubernetes\
 [](fg:#212736 bg:#1d2230)\
@@ -20,6 +20,14 @@ $time\
 [ ](fg:#1d2230)\
 \n$character"""
 #
+
+[gcloud]
+format = '[$symbol(\($project\))(\($region\))](fg:#a0a9cb bg:#1d2230)($style)'
+symbol = '󰫴 '
+style = 'bold blue'
+# [gcloud.region_aliases]
+# us-central1 = 'uc1'
+# us-east4 = 'ue4'
 
 [aws]
 format = '[$symbol($profile )(\($region\) )](fg:#a0a9cb bg:#1d2230)($style)'

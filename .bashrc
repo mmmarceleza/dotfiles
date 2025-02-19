@@ -43,20 +43,23 @@ HISTCONTROL="erasedups:ignoreboth"
 export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2>/dev/null
 #
 # enabling zoxide
-[ $(command -v zoxide) ] && eval "$(zoxide init bash)" # https://github.com/ajeetdsouza/zoxide
+[ "$(command -v zoxide)" ] && eval "$(zoxide init bash)" # https://github.com/ajeetdsouza/zoxide
 
 # enabling starship
-[ $(command -v starship) ] && eval "$(starship init bash)" # https://starship.rs/
+[ "$(command -v starship)" ] && eval "$(starship init bash)" # https://starship.rs/
 
 # autocompletion for kubectl
-[ $(command -v kubectl) ] && source <(kubectl completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
-[ $(command -v kubectl) ] && alias k=kubectl; complete -o default -F __start_kubectl k
+[ "$(command -v kubectl)" ] && source <(kubectl completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+[ "$(command -v kubectl)" ] && alias k=kubectl; complete -o default -F __start_kubectl k
 
 # autocompletion for flux
-[ $(command -v flux) ] && source <(flux completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+[ "$(command -v flux)" ] && source <(flux completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+
+# autocompletion for argocd
+[ "$(command -v arogcd)" ] && source <(argocd completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
 
 # enabling aws-assume-role to work as a function
-[ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0
+[ -f /home/marcelo/.local/bin/scripts/aws-assume-role ] && source /home/marcelo/.local/bin/scripts/aws-assume-role 0
 # -----------------------------------------------------------------------------
 
 # --------------------------------- Autokube ----------------------------------
@@ -65,3 +68,12 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 [ -f /opt/autokube/autokubectl.sh ] && . /opt/autokube/autokubectl.sh
 [ -f /opt/autokube/showkubectl.sh ] && . /opt/autokube/showkubectl.sh
 # -----------------------------------------------------------------------------
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/marcelo/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/home/marcelo/Downloads/google-cloud-sdk/path.bash.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/marcelo/Downloads/google-cloud-sdk/completion.bash.inc' ]; then . '/home/marcelo/Downloads/google-cloud-sdk/completion.bash.inc'; fi
+
+# autocompletion for terragrunt
+[ "$(command -v terragrunt)" ] && complete -C /usr/bin/terragrunt terragrunt

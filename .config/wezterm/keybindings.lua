@@ -14,7 +14,9 @@ local keybindings = {
 	{ key = "k", mods = "CTRL|SHIFT", action = act.AdjustPaneSize({ "Up", 3 }) },
 	{ key = "h", mods = "CTRL|SHIFT", action = act.AdjustPaneSize({ "Left", 3 }) },
 	{ key = "l", mods = "CTRL|SHIFT", action = act.AdjustPaneSize({ "Right", 3 }) },
-  { key = 'q', mods = 'CTRL|SHIFT', action = wezterm.action.QuitApplication },
+	{ key = "q", mods = "CTRL|SHIFT", action = wezterm.action.QuitApplication },
+	{ key = "{", mods = "CTRL|SHIFT", action = act.MoveTabRelative(-1) },
+	{ key = "}", mods = "CTRL|SHIFT", action = act.MoveTabRelative(1) },
 	{
 		key = "s",
 		mods = "CTRL|ALT",
@@ -44,8 +46,8 @@ local keybindings = {
 	-- Show the launcher in fuzzy selection mode and have it list all workspaces
 	-- and allow activating one.
 	{
-		key = "9",
-		mods = "ALT",
+		key = "w",
+		mods = "LEADER",
 		action = act.ShowLauncherArgs({
 			flags = "FUZZY|WORKSPACES",
 		}),

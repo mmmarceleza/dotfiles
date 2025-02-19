@@ -37,6 +37,7 @@ mason_lspconfig.setup({
 		"lua_ls",
 		"bashls",
 		"gopls",
+		"terraformls",
 		"yamlls",
 	},
 	-- auto-install configured servers (with lspconfig)

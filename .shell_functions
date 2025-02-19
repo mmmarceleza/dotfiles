@@ -99,3 +99,74 @@ fi
 #    --preview-window up:follow \
 #    --preview 'kubectl logs --follow --all-containers --tail=10000 --namespace {1} {2}' "$@"
 #}
+
+
+# status http code
+httpstat() {
+    if [[ -z $1 ]]; then
+        echo "Use: httpstat <http_code>"
+        echo "Exemple: httpstat 400"
+    else
+        curl "httpstat.us/$1"
+    fi
+}
+
+function myprs() {
+  gh search prs --assignee=@me --state=open --json number,title,repository |
+    jq -r '.[] | "\(.number) | \(.repository.nameWithOwner) | \(.title)"' |
+    fzf --delimiter '|' \
+        --preview 'gh pr view $(echo {} | cut -d"|" -f1) --repo $(echo {} | cut -d"|" -f2)' \
+        --preview-window right:60% \
+        --height 80% \
+        --border rounded \
+        --layout reverse \
+        --prompt "🔍 Select PR > " \
+        --pointer "➜" \
+        --header "Enter: open in browser | ctrl-c: exit" \
+        --color header:italic,pointer:cyan,prompt:blue \
+        --no-separator \
+        --padding 1 |
+    awk -F'|' '{print $1, "--repo", $2}' |
+    xargs gh pr view --web
+}
+
+# Adicione esta função ao seu ~/.bashrc ou ~/.zshrc
+function gfzfcommit() {
+    # Obtém a URL base do repositório GitHub
+    # Converte SSH para HTTPS: git@github.com:usuario/repo.git -> https://github.com/usuario/repo
+    local remote_url=$(git remote get-url origin | sed 's/:/\//' | sed 's/git@/https:\/\//' | sed 's/\.git$//')
+    
+    # Se não conseguir obter a URL, exibe erro e sai
+    if [ -z "$remote_url" ]; then
+        echo "Erro: Não foi possível obter a URL do repositório remoto"
+        return 1
+    fi
+
+    # Usa o fzf para selecionar o commit
+    # %h: hash curto
+    # %s: mensagem do commit
+    # %ad: data do commit
+    # %an: nome do autor
+    local commit=$(git log --format="%h %s [%ad] (%an)" --date=short | \
+        fzf --ansi \
+            --preview 'git show --color=always {1}' \
+            --preview-window=right:60% \
+            --bind 'ctrl-y:execute-silent(echo -n {1} | pbcopy)' \
+            --header 'Press CTRL-Y to copy commit hash')
+
+    # Se um commit foi selecionado
+    if [ -n "$commit" ]; then
+        # Extrai o hash do commit (primeira palavra da linha)
+        local commit_hash=$(echo "$commit" | awk '{print $1}')
+        # Monta a URL completa do commit
+        local commit_url="$remote_url/commit/$commit_hash"
+        # Abre no navegador padrão
+        if command -v xdg-open &> /dev/null; then
+            xdg-open "$commit_url"  # Linux
+        elif command -v open &> /dev/null; then
+            open "$commit_url"      # macOS
+        else
+            echo "URL do commit: $commit_url"
+        fi
+    fi
+}

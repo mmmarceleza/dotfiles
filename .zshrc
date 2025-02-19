@@ -12,6 +12,7 @@ path=(
     $HOME/.local/bin/scripts        # My local custom scripts
     ${KREW_ROOT:-$HOME/.krew}/bin   # Krew PATH (plugin manager for kubectl)
     $HOME/Applications              # AppImage default folder
+    $HOME/sync/git/chess/kotr/bin/  # kotr script
 )
 typeset -U path                     # Remove duplicate directories
 path=($^path(N-/))                  # Remove non-existent directories
@@ -109,13 +110,14 @@ zstyle ':fzf-tab:*' switch-group '<' '>'
 # script ftb-tmux-popup to make full use of it's "popup" feature
 zstyle ':fzf-tab:*' popup-min-size 180 12
 zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-
+export FZF_CTRL_T_OPTS="--preview 'fzf-preview.sh {}'"
 # preview directory's and file's content
 zstyle ':fzf-tab:complete:*:*' fzf-preview 'less ${(Q)realpath}'
-export LESSOPEN='|/home/marcelo/.local/bin/scripts/lessfilter %s'
+# zstyle ':fzf-tab:complete:*:*' fzf-preview 'fzf-preview.sh ${(Q)realpath}'
+export LESSOPEN='|/home/marcelo/.local/bin/scripts/lessfilter.sh %s'
 zstyle ':fzf-tab:complete:*:options' fzf-preview 
 zstyle ':fzf-tab:complete:*:argument-1' fzf-preview
-
+zstyle ':fzf-tab:complete:*:*' fzf-flags --height=100% --preview-window=right:wrap
 zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'echo ${(P)word}'
 # -----------------------------------------------------------------------------
 
@@ -133,13 +135,6 @@ compinit -d
 colors
 # Activate color support in the terminal
 # Allows the use of color variables for customizing output appearance
-# -----------------------------------------------------------------------------
-
-# ---------------------------- Aliases and functions --------------------------
-[ -f ~/.shell_aliases ] && . ~/.shell_aliases
-[ -f ~/.shell_functions ] && . ~/.shell_functions
-[ -f ~/.shell_aliases_private ] && . ~/.shell_aliases_private
-[ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
 # -----------------------------------------------------------------------------
 
 # --------------------------- Plugins configuration ---------------------------
@@ -188,13 +183,27 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 [ $(command -v zoxide) ] && eval "$(zoxide init zsh)" # https://github.com/ajeetdsouza/zoxide
 
 # autocompletion for kubectl
+compdef kubecolor=kubectl
 [ $(command -v kubectl) ] && source <(kubectl completion zsh) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
 
 # autocompletion for flux
 [ $(command -v flux) ] && source <(flux completion zsh) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
 
 # enabling aws-assume-role to work as a function
-[ -f /home/marcelo/.local/bin/aws-assume-role ] && source /home/marcelo/.local/bin/aws-assume-role 0
+[ -f /home/marcelo/.local/bin/scripts/aws-assume-role ] && source /home/marcelo/.local/bin/scripts/aws-assume-role 0
+
+# The next line updates PATH for the Google Cloud SDK.
+[ -f '/home/marcelo/Downloads/google-cloud-sdk/path.zsh.inc' ] && source '/home/marcelo/Downloads/google-cloud-sdk/path.zsh.inc'
+
+# The next line enables shell command completion for gcloud.
+[ -f '/home/marcelo/Downloads/google-cloud-sdk/completion.zsh.inc' ] && source '/home/marcelo/Downloads/google-cloud-sdk/completion.zsh.inc'
+# -----------------------------------------------------------------------------
+
+# ---------------------------- Aliases and functions --------------------------
+[ -f ~/.shell_aliases ] && . ~/.shell_aliases
+[ -f ~/.shell_functions ] && . ~/.shell_functions
+[ -f ~/.shell_aliases_private ] && . ~/.shell_aliases_private
+[ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
 # -----------------------------------------------------------------------------
 
 # --------------------------------- Autokube ----------------------------------
@@ -204,4 +213,6 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 [ -f /opt/autokube/showkubectl.sh ] && . /opt/autokube/showkubectl.sh
 # -----------------------------------------------------------------------------
 
-
+# autocompletion for terragrunt
+autoload -U +X bashcompinit && bashcompinit
+[ "$(command -v terragrunt)" ] && complete -o nospace -C /usr/bin/terragrunt terragrunt
