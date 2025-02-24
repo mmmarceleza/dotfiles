@@ -164,6 +164,7 @@ packages=(
     "perl-image-exiftool"
     "podman"
     "python-pip"
+    "python-tabulate"
     "qbittorrent"
     "qemu-full"
     "rclone"

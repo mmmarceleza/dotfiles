@@ -1,0 +1,94 @@
+#!/bin/bash
+
+set -e
+
+# Function to display help
+usage() {
+  echo "Usage: $0 [desired_version]"
+  echo -e "If no parameter is passed, the script will check the current cluster version."
+  echo "If a version is provided, the script will verify its existence and compare the images."
+  echo -e "Example:"
+  echo "  $0 v1.26.15+rke2r1"
+  exit 0
+}
+
+# Check if the user requested help
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+  usage
+fi
+
+# Functions to display colored messages
+success() { echo -e "\e[32m$1\e[0m"; }
+error() { echo -e "\e[31m$1\e[0m"; }
+info() { echo -e "\e[34m$1\e[0m"; }
+
+# Get the current cluster version
+CURRENT_VERSION=$(kubectl version -o json | jq -r '.serverVersion.gitVersion')
+info "Current cluster version: $CURRENT_VERSION"
+
+# Use the provided version or fallback to the current cluster version
+VERSION=${1:-$CURRENT_VERSION}
+info "Checking version: $VERSION"
+
+# Verify if the desired version is valid
+STATUS_CODE=$(curl -sI -o /dev/null -w "%{http_code}" "https://api.github.com/repos/rancher/rke2/releases/tags/$VERSION")
+if [[ "$STATUS_CODE" != "200" ]]; then
+  error "Error: Version $VERSION does not exist!\nCheck available versions at:\nhttps://github.com/rancher/rke2/releases"
+  exit 1
+fi
+
+success "Version $VERSION is valid!"
+
+# Retrieve the URL for the image list file
+IMAGES_URL=$(curl -s "https://api.github.com/repos/rancher/rke2/releases/tags/$VERSION" | jq -r '.assets[] | select(.name == "rke2-images-all.linux-amd64.txt") | .browser_download_url')
+if [[ -z "$IMAGES_URL" ]]; then
+  error "Could not retrieve the image list for version $VERSION."
+  exit 1
+fi
+
+# Create a temporary directory to store the file
+TMP_DIR=$(mktemp -d)
+IMAGES_FILE="$TMP_DIR/rke2-images.txt"
+info "Downloading image list..."
+curl -sL "$IMAGES_URL" -o "$IMAGES_FILE"
+success "Image list successfully downloaded!"
+
+# List of components and labels
+declare -A COMPONENTS=(
+  [cloud-controller-manager]="component=cloud-controller-manager"
+  [etcd]="component=etcd"
+  [kube-apiserver]="component=kube-apiserver"
+  [kube-controller-manager]="component=kube-controller-manager"
+  [kube-proxy]="component=kube-proxy"
+  [kube-scheduler]="component=kube-scheduler"
+  [node-local-dns]="k8s-app=node-local-dns"
+  [rke2-coredns-rke2-coredns]="app.kubernetes.io/name=rke2-coredns"
+  [rke2-snapshot-controller]="app.kubernetes.io/name=rke2-snapshot-controller"
+  [rke2-snapshot-validation]="app.kubernetes.io/name=rke2-snapshot-validation-webhook"
+)
+
+# Component verification
+info "Checking components in the kube-system namespace..."
+for COMPONENT in "${!COMPONENTS[@]}"; do
+  LABEL="${COMPONENTS[$COMPONENT]}"
+  IMAGE=$(kubectl get pods -n kube-system -l "$LABEL" -o jsonpath='{.items[0].spec.containers[0].image}' 2>/dev/null || echo "N/A")
+  NORMALIZED_IMAGE=${IMAGE/index.docker.io\//} # Reference: https://www.shellcheck.net/wiki/SC2001
+  
+  if [[ "$NORMALIZED_IMAGE" == "N/A" ]]; then
+    error "Component $COMPONENT not found!"
+    continue
+  fi
+  
+  if grep -q "$NORMALIZED_IMAGE" "$IMAGES_FILE"; then
+    success "$COMPONENT is using the correct image: $IMAGE"
+  else
+    error "$COMPONENT is outdated! Image in use: $IMAGE"
+  fi
+
+done
+
+# Cleanup
+test -d "$TMP_DIR" && rm -rf "$TMP_DIR"
+success "Verification completed!"
+
+
