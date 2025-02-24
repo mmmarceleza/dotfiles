@@ -5,9 +5,9 @@ set -e
 # Function to display help
 usage() {
   echo "Usage: $0 [desired_version]"
-  echo -e "If no parameter is passed, the script will check the current cluster version."
+  echo -e "\nIf no parameter is passed, the script will check the current cluster version."
   echo "If a version is provided, the script will verify its existence and compare the images."
-  echo -e "Example:"
+  echo -e "\nExample:"
   echo "  $0 v1.26.15+rke2r1"
   exit 0
 }
@@ -18,9 +18,13 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
 fi
 
 # Functions to display colored messages
-success() { echo -e "\e[32m$1\e[0m"; }
-error() { echo -e "\e[31m$1\e[0m"; }
-info() { echo -e "\e[34m$1\e[0m"; }
+success() { echo -e "\e[32m✔ $1\e[0m"; }
+error() { echo -e "\e[31m✖ $1\e[0m"; }
+info() { echo -e "\e[34mℹ $1\e[0m"; }
+separator() { 
+  printf '\e[33m%*s\e[0m\n' "$(tput cols)" | tr ' ' '-' 
+}
+# separator() { echo -e "\e[33m------------------------------------------------------\e[0m"; }
 
 # Get the current cluster version
 CURRENT_VERSION=$(kubectl version -o json | jq -r '.serverVersion.gitVersion')
@@ -71,24 +75,53 @@ declare -A COMPONENTS=(
 info "Checking components in the kube-system namespace..."
 for COMPONENT in "${!COMPONENTS[@]}"; do
   LABEL="${COMPONENTS[$COMPONENT]}"
-  IMAGE=$(kubectl get pods -n kube-system -l "$LABEL" -o jsonpath='{.items[0].spec.containers[0].image}' 2>/dev/null || echo "N/A")
-  NORMALIZED_IMAGE=${IMAGE/index.docker.io\//} # Reference: https://www.shellcheck.net/wiki/SC2001
   
-  if [[ "$NORMALIZED_IMAGE" == "N/A" ]]; then
+  # Add separator before checking each component
+  separator
+  info "🔍 Checking component: $COMPONENT"
+
+  # Get all images for the component, handling multiple Pods
+  # readarray -d ' ' -t IMAGES<<<$(kubectl get pods -n kube-system -l "$LABEL" -o jsonpath='{.items[*].spec.containers[*].image}')
+  # readarray -d ' ' -t PODS<<<$(kubectl get pods -n kube-system -l "$LABEL" -o jsonpath='{.items[*].metadata.name')
+
+  PODS_IMAGES=$(kubectl get pods -l "$LABEL" -o=custom-columns="PODS:.metadata.name,IMAGES:.spec.containers[*].image" --no-headers)
+
+  while IFS= read -r line; do
+      PODS_IMAGES_ARRAY+=("$line")
+  done <<< "$PODS_IMAGES"
+
+
+  if [[ ${#PODS_IMAGES_ARRAY[@]} -eq 0 ]]; then
     error "Component $COMPONENT not found!"
     continue
   fi
-  
-  if grep -q "$NORMALIZED_IMAGE" "$IMAGES_FILE"; then
-    success "$COMPONENT is using the correct image: $IMAGE"
-  else
-    error "$COMPONENT is outdated! Image in use: $IMAGE"
-  fi
 
+  ALL_IMAGES_MATCH=true
+
+  for POD in "${PODS_IMAGES_ARRAY[@]}"; do
+    POD_NAME="${POD%% *}"
+    POD_IMAGE="${POD##* }"
+    NORMALIZED_IMAGE=${POD_IMAGE/index.docker.io\//} # Remove prefix para comparação
+
+    if grep -q "$NORMALIZED_IMAGE" "$IMAGES_FILE"; then
+      success "$POD_NAME is using the correct image: $POD_IMAGE"
+    else
+      error "$POD_NAME is outdated! Image in use: $POD_IMAGE"
+      ALL_IMAGES_MATCH=false
+    fi
+  done
+  
+  unset PODS_IMAGES_ARRAY
+
+  # Display final status for the component
+  if $ALL_IMAGES_MATCH; then
+    success "✅ All Pods for $COMPONENT are using the correct images."
+  else
+    error "⚠ Some Pods for $COMPONENT are outdated."
+  fi
 done
 
 # Cleanup
 test -d "$TMP_DIR" && rm -rf "$TMP_DIR"
-success "Verification completed!"
-
+success "🎯 Verification completed!"
 
