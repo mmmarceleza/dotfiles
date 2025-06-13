@@ -146,6 +146,7 @@ packages=(
     "kubeval-bin"
     "kustomize"
     "lazygit"
+    "ldns"
     "lesspipe"
     "libreoffice-still"
     "libreoffice-still-pt-br"
