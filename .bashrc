@@ -77,3 +77,6 @@ if [ -f '/home/marcelo/Downloads/google-cloud-sdk/completion.bash.inc' ]; then .
 
 # autocompletion for terragrunt
 [ "$(command -v terragrunt)" ] && complete -C /usr/bin/terragrunt terragrunt
+
+# Set up fzf key bindings and fuzzy completion
+[ "$(command -v fzf)" ] && eval "$(fzf --bash)"

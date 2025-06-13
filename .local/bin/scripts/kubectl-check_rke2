@@ -81,10 +81,7 @@ for COMPONENT in "${!COMPONENTS[@]}"; do
   info "🔍 Checking component: $COMPONENT"
 
   # Get all images for the component, handling multiple Pods
-  # readarray -d ' ' -t IMAGES<<<$(kubectl get pods -n kube-system -l "$LABEL" -o jsonpath='{.items[*].spec.containers[*].image}')
-  # readarray -d ' ' -t PODS<<<$(kubectl get pods -n kube-system -l "$LABEL" -o jsonpath='{.items[*].metadata.name')
-
-  PODS_IMAGES=$(kubectl get pods -l "$LABEL" -o=custom-columns="PODS:.metadata.name,IMAGES:.spec.containers[*].image" --no-headers)
+  PODS_IMAGES=$(kubectl get pods -n kube-system -l "$LABEL" -o=custom-columns="PODS:.metadata.name,IMAGES:.spec.containers[*].image" --no-headers)
 
   while IFS= read -r line; do
       PODS_IMAGES_ARRAY+=("$line")

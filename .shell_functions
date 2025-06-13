@@ -170,3 +170,103 @@ function gfzfcommit() {
         fi
     fi
 }
+
+k3mowner() {
+  if [[ $# -lt 1 ]]; then
+    echo "Use: k3mowner <type> [name] [--namespace <namespace>]"
+    return 1
+  fi
+
+  local tipo="$1"
+  local nome="$2"
+
+  if [[ -n "$nome" && "$nome" != --* ]]; then
+    shift 2
+    kubectl get "$tipo" "$nome" "$@" -o custom-columns="NAME:.metadata.name,NAMESPACE:.metadata.namespace,OWNER_KIND:.metadata.ownerReferences[*].kind,OWNER_NAME:.metadata.ownerReferences[*].name"
+  else
+    shift 1
+    kubectl get "$tipo" "$@" -o custom-columns="NAME:.metadata.name,NAMESPACE:.metadata.namespace,OWNER_KIND:.metadata.ownerReferences[*].kind,OWNER_NAME:.metadata.ownerReferences[*].name"
+  fi
+}
+
+klabel() {
+  local kind="$1"
+
+  if [[ -z "$kind" ]]; then
+    echo "You must provide a resource type."
+    echo "Example: klabel node"
+    echo "         klabel pod my-pod-name"
+    return 1
+  fi
+
+  shift # move os argumentos, agora que já sabemos que $1 existe
+
+  if [[ $# -eq 0 ]]; then
+    # No names provided, get all objects of the given type
+    kubectl get "$kind" -o json | jq '.items[] | {name: .metadata.name, labels: .metadata.labels}'
+  else
+    # Specific object names provided
+    for name in "$@"; do
+      if ! output=$(kubectl get "$kind" "$name" -o json 2>/dev/null); then
+        echo "Failed to get $kind $name"
+        continue
+      fi
+      echo "$output" | jq '{name: .metadata.name, labels: .metadata.labels}'
+    done
+  fi
+}
+
+kannotation() {
+  local kind="$1"
+
+  if [[ -z "$kind" ]]; then
+    echo "You must provide a resource type."
+    echo "Example: kannotation node"
+    echo "         kannotation pod my-pod-name"
+    return 1
+  fi
+
+  shift
+
+  if [[ $# -eq 0 ]]; then
+    # No names provided, get all objects of the given type
+    kubectl get "$kind" -o json | jq '.items[] | {name: .metadata.name, annotations: .metadata.annotations}'
+  else
+    # Specific object names provided
+    for name in "$@"; do
+      if ! output=$(kubectl get "$kind" "$name" -o json 2>/dev/null); then
+        echo "Failed to get $kind $name"
+        continue
+      fi
+      echo "$output" | jq '{name: .metadata.name, annotations: .metadata.annotations}'
+    done
+  fi
+}
+
+function gcp-terraform() {
+    # Obtém o PID do processo do Konsole
+    local pid=$(pidof -s konsole)
+    if [ -z "$pid" ]; then
+        echo "Konsole não está em execução."
+        return 1
+    fi
+
+    # Define o nome do serviço D-Bus
+    local service="org.kde.konsole-$pid"
+
+    # Cria uma nova aba e obtém o ID da sessão
+    local session_id=$(qdbus $service /Windows/1 newSession)
+    if [ -z "$session_id" ]; then
+        echo "Não foi possível criar uma nova aba."
+        return 1
+    fi
+
+    # Executa o comando 'cd' para alterar o diretório de trabalho
+    qdbus $service /Sessions/$session_id org.kde.konsole.Session.runCommand "cd ~/sync/git/chess/gcp-terraform && clear"
+
+    # Define o título da aba
+    qdbus $service /Sessions/$session_id org.kde.konsole.Session.setTitle 1 "GCP-TERRAFORM"
+
+    # Traz a nova aba para o foco
+    qdbus $service /Windows/1 org.kde.konsole.Window.setCurrentSession $session_id
+}

@@ -216,3 +216,6 @@ compdef kubecolor=kubectl
 # autocompletion for terragrunt
 autoload -U +X bashcompinit && bashcompinit
 [ "$(command -v terragrunt)" ] && complete -o nospace -C /usr/bin/terragrunt terragrunt
+
+# Set up fzf key bindings and fuzzy completion
+[ "$(command -v fzf)" ] && source <(fzf --zsh)

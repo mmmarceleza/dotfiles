@@ -179,6 +179,7 @@ packages=(
     "tailspin"
     "telegram-desktop"
     "terraform"
+    "tfautomv-bin"
     "thunderbird"
     "thunderbird-i18n-en-us"
     "thunderbird-i18n-pt-br"
