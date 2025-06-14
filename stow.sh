@@ -21,7 +21,6 @@ usage() {
   echo "  --uninstall      Unlink instead of stow"
   echo "  --dry-run        Show actions without applying"
   echo "  --verbose        Show verbose output from stow"
-  echo "  --force          Force stow to override existing files (adds --override)"
   echo "  --help           Show this help message"
   echo
   echo -e "${BLUE}Examples:${RESET}"
@@ -30,7 +29,6 @@ usage() {
   echo "  $(basename "$0") --uninstall nvim"
   echo "  $(basename "$0") --dry-run wezterm"
   echo "  $(basename "$0") --verbose"
-  echo "  $(basename "$0") --force zsh"
   exit 0
 }
 
@@ -50,7 +48,6 @@ TARGET_DIR="$HOME"
 ACTION="--stow"
 DRY_RUN=false
 VERBOSE=false
-FORCE=false
 STOW_DIRS=()
 
 # ----------------------------
@@ -68,10 +65,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     --verbose)
       VERBOSE=true
-      shift
-      ;;
-    --force)
-      FORCE=true
       shift
       ;;
     --help)
@@ -115,7 +108,6 @@ echo -e "${BLUE}Target directory:  ${RESET} $TARGET_DIR"
 echo -e "${BLUE}Action:            ${RESET} $ACTION"
 $DRY_RUN && echo -e "${YELLOW}Dry-run enabled${RESET}"
 $VERBOSE && echo -e "${BLUE}Verbose output:    ${RESET} enabled"
-$FORCE && echo -e "${YELLOW}Force override:    ${RESET} enabled"
 echo -e "${BLUE}Packages:          ${RESET} ${STOW_DIRS[*]}"
 echo
 
@@ -126,17 +118,16 @@ for dir in "${STOW_DIRS[@]}"; do
   echo -e "${GREEN}Processing: $dir${RESET}"
   CMD=(stow --target="$TARGET_DIR" --dir="$DOTFILES_DIR" "$ACTION")
   $VERBOSE && CMD+=("--verbose")
-  $FORCE && CMD+=("--override='all'")
   CMD+=("$dir")
 
   if $DRY_RUN; then
     echo -e "${YELLOW}Would run:${RESET} ${CMD[*]}"
   else
-    OUTPUT="$("${CMD[@]}" 2>&1)"
-    if [[ -n "$OUTPUT" ]]; then
+    if ! OUTPUT="$("${CMD[@]}" 2>&1)"; then
+      echo -e "${RED}Error processing package: $dir${RESET}"
       echo "$OUTPUT"
-    elif [[ "$ACTION" == "--stow" ]]; then
-      echo -e "${YELLOW}Nothing to do for package: $dir${RESET}"
+    else
+      [[ -n "$OUTPUT" ]] && echo "$OUTPUT"
     fi
   fi
 done

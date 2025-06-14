@@ -21,7 +21,7 @@ alias nvimrc="vim ~/.config/nvim"
 alias vimrc="vim ~/.vimrc"
 alias tmuxrc="vim ~/.tmux.conf"
 alias starshiprc="vim ~/.config/starship.toml"
-alias dot="vim ~/.config/nvim/"
+alias dot="vim ~/sync/git/mmmarceleza/github/dotfiles/"
 alias dotp="vim ~/sync/git/mmmarceleza/github/dotfiles-private/"
 alias wezrc="vim ~/.wezterm.lua"
 # cat customization

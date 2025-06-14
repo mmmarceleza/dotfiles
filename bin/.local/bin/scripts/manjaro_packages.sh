@@ -28,11 +28,24 @@ function require_package () {
   sudo pacman -S "$1" --noconfirm || abort "Error installing $1"
 }
 
+# Check pre-requisites for the script
+function check_prerequisites() {
+  # Check if Snap is installed
+  if ! systemctl is-active snapd.socket &>/dev/null; then
+    abort "Snap is not installed. Please install Snap to continue. Check https://snapcraft.io/docs/installing-snap-on-manjaro-linux"
+  fi
+  # Check if Flatpak is installed
+  if ! command -v flatpak &>/dev/null; then
+    abort "Flatpak is not installed. Please install Flatpak to continue. Check https://flatpak.org/setup/Manjaro/"
+  fi
+}
+
+
 # Check if a unit exists, enable and start it if necessary
 function enable_start_unit() {
-  [ $# -eq 0 ] && return 1
+  [ "$#" -eq 0 ] && return 1
 
-  local unit_name=$1
+  local unit_name="$1"
 
   # Check if the unit exists
   if ! systemctl cat --no-pager "$unit_name" &>/dev/null ; then
@@ -46,7 +59,7 @@ function enable_start_unit() {
   else
     # Enable the unit if it's not already enabled
     echo "Enabling unit $unit_name..."
-    sudo systemctl enable "$unit_name"
+    sudo systemctl enable --now "$unit_name"
   fi
 
   # Check if the unit is running
@@ -67,7 +80,7 @@ function add_user_to_group () {
   local group=$1
 
   if ! grep -E "^$group:" /etc/group | grep "$SCRIPT_USER" &>/dev/null; then
-    sudo usermod -aG "$group" "$SCRIPT_USER"; echo "usermod"
+    sudo usermod -aG "$group" "$SCRIPT_USER";
   fi
 }
 
@@ -93,7 +106,7 @@ fi
 SCRIPT_USER="$1"
 eval USER_HOME=~"$1"
 
-# check if the user home exists
+# check if the user ho  me exists
 if ! [ -d "$USER_HOME" ]; then
   abort "userdir not found: $1"
 fi
@@ -102,10 +115,9 @@ fi
 #                                  Main Script
 #------------------------------------------------------------------------------
 # List of packages to install from the main repositories
-packages=(
+pacman_packages=(
     "actionlint"
-    "arogcd"
-    "aws-cli-v2"
+    "argocd"
     "base-devel"
     "bash-completion"
     "bat"
@@ -125,11 +137,8 @@ packages=(
     "git-delta"
     "github-cli"
     "gnu-netcat"
-    "grype-bin"
     "go-yq"
     "go"
-    "google-chrome"
-    "hadolint-bin"
     "helm"
     "inkscape"
     "ipcalc"
@@ -137,19 +146,10 @@ packages=(
     "k9s"
     "kdiff3"
     "keepassxc"
-    "kind-bin"
-    "kyverno-git"
-    "kubectl"
     "kubectx"
-    "kube-lint"
-    "kubepug-bin"
-    "kubeval-bin"
-    "kustomize"
     "lazygit"
     "ldns"
     "lesspipe"
-    "libreoffice-still"
-    "libreoffice-still-pt-br"
     "lsd"
     "make"
     "mediainfo"
@@ -158,9 +158,7 @@ packages=(
     "neovim"
     "nodejs"
     "npm"
-    "okd-client-bin"
     "openfortivpn"
-    # "paru-bin"
     "peek"
     "perl-image-exiftool"
     "podman"
@@ -180,10 +178,6 @@ packages=(
     "tailspin"
     "telegram-desktop"
     "terraform"
-    "tfautomv-bin"
-    "thunderbird"
-    "thunderbird-i18n-en-us"
-    "thunderbird-i18n-pt-br"
     "tldr"
     "tmux"
     "tree"
@@ -191,12 +185,9 @@ packages=(
     "ttf-hack-nerd"
     "ttf-jetbrains-mono-nerd"
     "unzip"
-    "vagrant"
     "vault"
-    "velero-bin"
     "vim"
     "virt-manager"
-    "vscodium-bin"
     "wezterm"
     "whois"
     "wine"
@@ -213,19 +204,47 @@ packages=(
     "zoxide"
 )
 
+# List of packages to install from the AUR (Arch User Repository)
+aur_packages=(
+    "grype-bin"
+    "hadolint-bin"
+    "kind-bin"
+    "kube-lint"
+    "kubepug-bin"
+    "kubeval-bin"
+    "okd-client-bin"
+    "paru-bin"
+    "tfautomv-bin"
+    "vagrant"
+    "velero-bin"
+)
+
 # List of packages to install from Flathub (https://flathub.org/)
 flatpak_packages=(
     "com.jgraph.drawio.desktop"
+    "com.google.Chrome"
     "com.obsproject.Studio"
-    "com.slack.Slack"
-    "com.spotify.Client"
-    "md.obsidian.Obsidian"
     "net.pcsx2.PCSX2"
     "org.audacityteam.Audacity"
     "org.jdownloader.JDownloader"
     "org.kde.kdenlive"
-    "org.libretro.RetroArch"
     "org.videolan.VLC"
+)
+
+# List of snap packages to install
+snap_packages=(
+    "pdfarranger"
+    "slack"
+    "spotify"
+    "todoist"
+)
+
+# List of snap packages to install (classic confinement)
+snap_packages_classic=(
+    "aws-cli"
+    "code"
+    "google-cloud-sdk"
+    "obsidian"    
 )
 
 # List of appimage packages to install
@@ -241,15 +260,31 @@ python_packages=(
   "python-hcl2"
   )
 
+# checking prerequisites
+title "Checking prerequisites"
+check_prerequisites
+
+# installing pacman packages
+title "Installing pacman packages"
+sudo pacman -Syu --noconfirm --needed "${pacman_packages[@]}" || abort "Error installing/updating packages"
+
 # installing yay packages
 title "Installing yay packages"
 require_package yay
-yay -Syu --noconfirm --needed "${packages[@]}" || abort "Error installing/updating packages"
+yay -Syu --noconfirm --needed "${packages[@]}" || abort "Error installing/updating AUR packages"
 
 # installing Flatpak packages
 title "Installing flatpak packages"
 require_package flatpak
 flatpak install flathub -y "${flatpak_packages[@]}" || abort "Error installing flatpak package"
+
+# installing Snap packages
+title "Installing snap packages"
+sudo snap install "${snap_packages[@]}" || abort "Error installing snap package"
+title "Installing snap packages with classic confinement"
+for pkg in "${snap_packages_classic[@]}"; do
+  sudo snap install "$pkg" --classic || abort "Error installing snap package"
+done
 
 # # Create the directory to install appimage packages, if it doesn't exist
 # title "Installing AppImage packages"
