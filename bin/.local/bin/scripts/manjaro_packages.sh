@@ -151,6 +151,7 @@ pacman_packages=(
     "ldns"
     "lesspipe"
     "lsd"
+    "mariadb-clients"
     "make"
     "mediainfo"
     "meld"
