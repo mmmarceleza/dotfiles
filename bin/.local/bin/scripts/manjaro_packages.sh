@@ -206,6 +206,7 @@ pacman_packages=(
 
 # List of packages to install from the AUR (Arch User Repository)
 aur_packages=(
+    "cloudflare-warp-bin"
     "grype-bin"
     "hadolint-bin"
     "kind-bin"
@@ -271,7 +272,7 @@ sudo pacman -Syu --noconfirm --needed "${pacman_packages[@]}" || abort "Error in
 # installing yay packages
 title "Installing yay packages"
 require_package yay
-yay -Syu --noconfirm --needed "${packages[@]}" || abort "Error installing/updating AUR packages"
+yay -Syu --noconfirm --needed "${aur_packages[@]}" || abort "Error installing/updating AUR packages"
 
 # installing Flatpak packages
 title "Installing flatpak packages"

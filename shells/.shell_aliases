@@ -6,6 +6,7 @@ alias lg='lazygit'
 # applications
 alias n='nvim-qt'
 alias t='tmux'
+alias ts='tailscale'
 
 # some configurations
 [ $(command -v nvim) ] && alias vim="nvim"
