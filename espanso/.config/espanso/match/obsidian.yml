@@ -1,0 +1,15 @@
+matches:
+  # Simple text replacement
+  - trigger: ";bash"
+    replace: |
+      ```bash
+
+      ```
+  - trigger: ";ts"
+    replace: "`{{mytime}}` - "
+    vars:
+      - name: mytime
+        type: date
+        params:
+          format: "%H:%M"
+

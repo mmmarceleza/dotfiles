@@ -129,7 +129,6 @@ pacman_packages=(
     "crane"
     "discord"
     "dive"
-    "docker"
     "docker-compose"
     "eza"
     "fd"
@@ -208,6 +207,7 @@ pacman_packages=(
 # List of packages to install from the AUR (Arch User Repository)
 aur_packages=(
     "cloudflare-warp-bin"
+    "espanso-x11-bin"
     "grype-bin"
     "hadolint-bin"
     "kind-bin"
@@ -245,7 +245,6 @@ snap_packages=(
 snap_packages_classic=(
     "aws-cli"
     "code"
-    "google-cloud-sdk"
     "obsidian"    
 )
 
@@ -285,7 +284,7 @@ title "Installing snap packages"
 sudo snap install "${snap_packages[@]}" || abort "Error installing snap package"
 title "Installing snap packages with classic confinement"
 for pkg in "${snap_packages_classic[@]}"; do
-  sudo snap install "$pkg" --classic || abort "Error installing snap package"
+  sudo snap install --classic "$pkg" || abort "Error installing snap package"
 done
 
 # # Create the directory to install appimage packages, if it doesn't exist

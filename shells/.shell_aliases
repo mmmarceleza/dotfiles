@@ -25,6 +25,7 @@ alias starshiprc="vim ~/.config/starship.toml"
 alias dot="vim ~/sync/git/mmmarceleza/github/dotfiles/"
 alias dotp="vim ~/sync/git/mmmarceleza/github/dotfiles-private/"
 alias wezrc="vim ~/.wezterm.lua"
+alias espansorc="vim ~/.config/espanso/"
 # cat customization
 [ $(command -v bat) ] && alias cat='bat --decorations=never'
 
