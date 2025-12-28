@@ -205,7 +205,7 @@ compdef kubecolor=kubectl
 [ -f ~/.shell_functions ] && . ~/.shell_functions
 [ -f ~/.shell_aliases_private ] && . ~/.shell_aliases_private
 [ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
-[ -f ~/.kubectl-getinfo ] && . ~/.kubectl-getinfo
+[ -f ~/.getinfo_aliases ] && . ~/.getinfo_aliases
 # -----------------------------------------------------------------------------
 
 # --------------------------------- Autokube ----------------------------------
@@ -221,3 +221,9 @@ autoload -U +X bashcompinit && bashcompinit
 
 # Set up fzf key bindings and fuzzy completion
 [ "$(command -v fzf)" ] && source <(fzf --zsh)
+
+# Autocomplete for kubectl-getinfo # https://github.com/mmmarceleza/kubectl-getinfo
+[ "$(command -v kubectl-getinfo)" ] && source <(kubectl-getinfo completion zsh)
+
+# Set up Zellij auto-start
+# eval "$(zellij setup --generate-auto-start zsh)"
