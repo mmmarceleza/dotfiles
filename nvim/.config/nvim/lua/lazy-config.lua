@@ -226,6 +226,11 @@ require("lazy").setup({
 	-- Fix Neovim-qt (https://github.com/equalsraf/neovim-qt/issues/949)
 	----------------------------------------
 	"equalsraf/neovim-gui-shim", -- https://github.com/equalsraf/neovim-gui-shim
+
+	----------------------------------------
+	-- Copilot
+	----------------------------------------
+	"github/copilot.vim", -- https://github.com/github/copilot.vim
 })
 
 -- TODO
