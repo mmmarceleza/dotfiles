@@ -7,6 +7,7 @@ alias lg='lazygit'
 alias n='nvim-qt'
 alias t='tmux'
 alias ts='tailscale'
+alias c='cursor'
 
 # some configurations
 [ $(command -v nvim) ] && alias vim="nvim"
@@ -83,6 +84,13 @@ alias vpndown='sudo wg-quick down protonvpn' # vpn disconnect
 # Docker
 alias redis-cli='docker run --rm --network=host redis:alpine redis-cli'
 alias shellcheck='docker run -v $(pwd):/mnt koalaman/shellcheck --color=always'
+
+# Kubeflow
+# python -m venv ~/.venvs/kfp
+# source ~/.venvs/kfp/bin/activate
+# pip install --upgrade pip
+# pip install kfp
+alias kfp="$HOME/.venvs/kfp/bin/kfp"
 
 # Personal Kubernetes 
 alias sortyaml='yq eval "sort_keys(..)" -'

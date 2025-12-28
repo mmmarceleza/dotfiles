@@ -1,10 +1,10 @@
 y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+            builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
 }
 
 # Load a kubeconfig file of a Kubernetes cluster
@@ -269,4 +269,17 @@ function gcp-terraform() {
 
     # Traz a nova aba para o foco
     qdbus $service /Windows/1 org.kde.konsole.Window.setCurrentSession $session_id
+}
+
+# This is to clean my konsole logs from ~/.local/share/konsole/audit/
+# Example use: strip_ansi 2025-09-24_180001-21630.log > 2025-09-24_180001-21630-clean.log
+strip_ansi() {
+  LC_ALL=C sed -E 's/\x1B\[[0-?]*[\x20-\x2F]*[@-~]//g; s/\x1B\][^\x07]*\x07//g; s/\x1B\][^\x1B]*\x1B\\//g; s/\r//g' "$@"
+}
+
+# Kubeflow Pipelines CLI via Docker (v2.5.x, rede do host)
+kfp-docker() {
+  docker run --rm -it --network=host \
+    -v "$PWD":/work -w /work python:3.12 \
+    bash -lc "pip install -q 'kfp~=2.5' >/dev/null && kfp $*"
 }
