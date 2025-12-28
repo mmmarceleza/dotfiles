@@ -53,7 +53,7 @@ HELM_REPOS=(
   "metallb              https://metallb.github.io/metallb"
   "metrics-server       https://kubernetes-sigs.github.io/metrics-server/"
   "minio                https://operator.min.io/"
-  "openebs              https://openebs.github.io/charts"
+  "openebs              https://openebs.github.io/openebs"
   "open-telemetry       https://open-telemetry.github.io/opentelemetry-helm-charts"
   "podinfo              https://stefanprodan.github.io/podinfo"
   "prometheus-community https://prometheus-community.github.io/helm-charts"
@@ -105,25 +105,26 @@ helm repo update
 
 
 # Installing hcl2json
-if [ "$(command -v hcl2json)" ]; then
-  echo "hcl2json already installed"
-else
-  DOWNLOAD_URL_HCL2JSON=$(curl -s https://api.github.com/repos/tmccombs/hcl2json/releases/latest \
-    | jq -r --arg name "hcl2json_linux_amd64" '.assets[] | select(.name == $name) | .browser_download_url')
-  curl -fsSL "$DOWNLOAD_URL_HCL2JSON" -o "$BIN_DIR/hcl2json"
-  chmod +x "$BIN_DIR"/hcl2json
-  ln -sf "$BIN_DIR"/hcl2json "$HOME"/.local/bin/hcl2json
-  echo "hcl2json instalado em $HOME/.local/bin/"
-fi
+# if [ "$(command -v hcl2json)" ]; then
+#   echo "hcl2json already installed"
+# else
+#   DOWNLOAD_URL_HCL2JSON=$(curl -s https://api.github.com/repos/tmccombs/hcl2json/releases/latest \
+#     | jq -r --arg name "hcl2json_linux_amd64" '.assets[] | select(.name == $name) | .browser_download_url')
+#   curl -fsSL "$DOWNLOAD_URL_HCL2JSON" -o "$BIN_DIR/hcl2json"
+#   chmod +x "$BIN_DIR"/hcl2json
+#   ln -sf "$BIN_DIR"/hcl2json "$HOME"/.local/bin/hcl2json
+#   echo "hcl2json instalado em $HOME/.local/bin/"
+# fi
 
 # Installing kubescape
-if [ "$(command -v kubescape)" ]; then
-  echo "kubescape already installed"
-else
-  DOWNLOAD_URL_KUBESCAPE=$(curl -s https://api.github.com/repos/kubescape/kubescape/releases/latest \
-    | jq -r --arg name "kubescape-ubuntu-latest" '.assets[] | select(.name == $name) | .browser_download_url')
-  curl -fsSL "$DOWNLOAD_URL_KUBESCAPE" -o "$BIN_DIR/kubescape"
-  chmod +x "$BIN_DIR"/kubescape
-  ln -sf "$BIN_DIR"/kubescape "$HOME"/.local/bin/kubescape
-  echo "kubescape instalado em $HOME/.local/bin/"
-fi
+# if [ "$(command -v kubescape)" ]; then
+#   echo "kubescape already installed"
+# else
+#   DOWNLOAD_URL_KUBESCAPE=$(curl -s https://api.github.com/repos/kubescape/kubescape/releases/latest \
+#     | jq -r --arg name "kubescape-ubuntu-latest" '.assets[] | select(.name == $name) | .browser_download_url')
+#   curl -fsSL "$DOWNLOAD_URL_KUBESCAPE" -o "$BIN_DIR/kubescape"
+#   chmod +x "$BIN_DIR"/kubescape
+#   ln -sf "$BIN_DIR"/kubescape "$HOME"/.local/bin/kubescape
+#   echo "kubescape instalado em $HOME/.local/bin/"
+# fi
+#
