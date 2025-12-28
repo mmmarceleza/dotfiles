@@ -22,6 +22,10 @@ fi
 if [ -d "$HOME/Applications" ] && [ "${PATH#*"$HOME"/Applications}" == "$PATH" ]; then
     export PATH="$HOME/Applications:$PATH"
 fi
+# adding ~/.npm-global folder to the PATH (appimage default application folder)
+if [ -d "$HOME/.npm-global/bin" ] && [ "${PATH#*"$HOME"/.npm-global/bin}" == "$PATH" ]; then
+    export PATH="$HOME/.npm-global/bin:$PATH"
+fi
 # -----------------------------------------------------------------------------
 
 # --------------------------- History configuration ---------------------------

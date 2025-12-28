@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ----------------------------
-# Color definitions
+# Color definitions for output formatting
 # ----------------------------
 RED="\033[0;31m"
 GREEN="\033[0;32m"
@@ -11,7 +11,7 @@ BLUE="\033[1;34m"
 RESET="\033[0m"
 
 # ----------------------------
-# Helper: print usage
+# Helper function: print usage instructions
 # ----------------------------
 usage() {
   echo -e "${BLUE}Usage:${RESET}"
@@ -33,7 +33,7 @@ usage() {
 }
 
 # ----------------------------
-# Check dependencies
+# Check if 'stow' is installed
 # ----------------------------
 if ! command -v stow >/dev/null 2>&1; then
   echo -e "${RED}Error: 'stow' is not installed or not in PATH.${RESET}" >&2
@@ -41,48 +41,48 @@ if ! command -v stow >/dev/null 2>&1; then
 fi
 
 # ----------------------------
-# Initialization
+# Initialization of variables
 # ----------------------------
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="$HOME"
-ACTION="--stow"
-DRY_RUN=false
-VERBOSE=false
-STOW_DIRS=()
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" # Directory containing this script
+TARGET_DIR="$HOME"      # Where dotfiles will be stowed (usually $HOME)
+ACTION="--stow"         # Default action is to stow (link files)
+DRY_RUN=false           # If true, only simulate actions
+VERBOSE=false           # If true, show verbose output
+STOW_DIRS=()            # List of packages to stow
 
 # ----------------------------
-# Argument parsing
+# Parse command-line arguments
 # ----------------------------
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --uninstall)
-      ACTION="--delete"
+      ACTION="--delete" # Change action to delete (unstow)
       shift
       ;;
     --dry-run)
-      DRY_RUN=true
+      DRY_RUN=true      # Enable dry-run mode
       shift
       ;;
     --verbose)
-      VERBOSE=true
+      VERBOSE=true      # Enable verbose output
       shift
       ;;
     --help)
-      usage
+      usage             # Show usage and exit
       ;;
     -*)
       echo -e "${RED}Unknown option: $1${RESET}" >&2
       usage
       ;;
     *)
-      STOW_DIRS+=("$1")
+      STOW_DIRS+=("$1") # Add package to list
       shift
       ;;
   esac
 done
 
 # ----------------------------
-# Discover packages (if none specified)
+# If no packages specified, stow all directories in DOTFILES_DIR
 # ----------------------------
 if [[ ${#STOW_DIRS[@]} -eq 0 ]]; then
   for d in "$DOTFILES_DIR"/*/; do
@@ -91,7 +91,7 @@ if [[ ${#STOW_DIRS[@]} -eq 0 ]]; then
 fi
 
 # ----------------------------
-# Validate directories
+# Validate that each package directory exists
 # ----------------------------
 for dir in "${STOW_DIRS[@]}"; do
   if [[ ! -d "$DOTFILES_DIR/$dir" ]]; then
@@ -101,7 +101,7 @@ for dir in "${STOW_DIRS[@]}"; do
 done
 
 # ----------------------------
-# Summary
+# Print summary of actions to be performed
 # ----------------------------
 echo -e "${BLUE}Dotfiles directory:${RESET} $DOTFILES_DIR"
 echo -e "${BLUE}Target directory:  ${RESET} $TARGET_DIR"
@@ -112,7 +112,7 @@ echo -e "${BLUE}Packages:          ${RESET} ${STOW_DIRS[*]}"
 echo
 
 # ----------------------------
-# Apply or simulate
+# Apply stow/uninstall for each package
 # ----------------------------
 for dir in "${STOW_DIRS[@]}"; do
   echo -e "${GREEN}Processing: $dir${RESET}"
@@ -121,8 +121,10 @@ for dir in "${STOW_DIRS[@]}"; do
   CMD+=("$dir")
 
   if $DRY_RUN; then
+    # Show what would be run, but do not execute
     echo -e "${YELLOW}Would run:${RESET} ${CMD[*]}"
   else
+    # Run the stow command and handle errors/output
     if ! OUTPUT="$("${CMD[@]}" 2>&1)"; then
       echo -e "${RED}Error processing package: $dir${RESET}"
       echo "$OUTPUT"
@@ -133,4 +135,3 @@ for dir in "${STOW_DIRS[@]}"; do
 done
 
 echo -e "\n${GREEN}Done.${RESET}"
-

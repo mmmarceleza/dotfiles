@@ -13,6 +13,7 @@ path=(
     ${KREW_ROOT:-$HOME/.krew}/bin   # Krew PATH (plugin manager for kubectl)
     $HOME/Applications              # AppImage default folder
     $HOME/sync/git/chess/kotr/bin/  # kotr script
+    $HOME/.npm-global/bin           # npm packages
 )
 typeset -U path                     # Remove duplicate directories
 path=($^path(N-/))                  # Remove non-existent directories
@@ -204,6 +205,7 @@ compdef kubecolor=kubectl
 [ -f ~/.shell_functions ] && . ~/.shell_functions
 [ -f ~/.shell_aliases_private ] && . ~/.shell_aliases_private
 [ -f ~/.shell_functions_private ] && . ~/.shell_functions_private
+[ -f ~/.kubectl-getinfo ] && . ~/.kubectl-getinfo
 # -----------------------------------------------------------------------------
 
 # --------------------------------- Autokube ----------------------------------
