@@ -6,7 +6,7 @@
 
 ---
 
-# My Links--
+# My Links
 
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/marcelomarquesmelo/)
 [![twitter](https://img.shields.io/badge/twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/mmmarceleza)
@@ -15,13 +15,70 @@
 
 ---
 
-# Instructions
+# Prerequisites
 
-Execute the following command:
+- [GNU Stow](https://www.gnu.org/software/stow/)
+
+---
+
+# Installation
+
+Clone this repository and run the stow script:
+
+```bash
+git clone https://github.com/mmmarceleza/dotfiles.git
+cd dotfiles
+./stow.sh
+```
+
+---
+
+# Usage
 
 ```
-curl -Lks https://raw.githubusercontent.com/mmmarceleza/dotfiles/main/.local/bin/install.sh | /bin/bash
+./stow.sh [options] [package1 package2 ...]
 ```
+
+**Options:**
+
+| Option        | Description                      |
+|---------------|----------------------------------|
+| `--uninstall` | Remove symlinks instead of stow  |
+| `--dry-run`   | Show actions without applying    |
+| `--verbose`   | Show detailed output from stow   |
+| `--help`      | Display help message             |
+
+**Examples:**
+
+```bash
+./stow.sh                     # Apply all dotfiles
+./stow.sh bash nvim           # Apply specific packages
+./stow.sh --uninstall nvim    # Remove symlinks for nvim
+./stow.sh --dry-run wezterm   # Preview changes without applying
+./stow.sh --verbose           # Apply all with detailed output
+```
+
+---
+
+# Available Packages
+
+| Package   | Description                          |
+|-----------|--------------------------------------|
+| bash      | Bash shell configuration             |
+| bin       | User scripts and binaries            |
+| dolphin   | KDE Dolphin file manager             |
+| espanso   | Text expander                        |
+| git       | Git configuration                    |
+| kanata    | Keyboard remapping                   |
+| konsole   | KDE Konsole terminal                 |
+| nvim      | Neovim configuration (Lua-based)     |
+| shells    | Shared aliases and functions         |
+| starship  | Starship prompt                      |
+| tmux      | Tmux terminal multiplexer            |
+| vim       | Vim configuration                    |
+| wezterm   | WezTerm terminal emulator            |
+| zellij    | Zellij terminal multiplexer          |
+| zsh       | Zsh shell configuration              |
 
 ---
 
