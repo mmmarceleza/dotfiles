@@ -9,7 +9,7 @@ TabColor=24,25,29,0
 CursorShape=0
 
 [General]
-Command=/bin/zsh
+Command=/home/marcelo/sync/git/mmmarceleza/github/dotfiles/bin/.local/bin/scripts/konsole-audit.sh
 DimWhenInactive=false
 InvertSelectionColors=false
 Name=marcelo-zsh
@@ -31,5 +31,5 @@ ScrollFullPage=true
 
 [Terminal Features]
 BlinkingCursorEnabled=true
-LineNumbers=2
+LineNumbers=0
 VerticalLine=false

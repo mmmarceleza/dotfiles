@@ -21,6 +21,7 @@ usage() {
   echo "  --uninstall      Unlink instead of stow"
   echo "  --dry-run        Show actions without applying"
   echo "  --verbose        Show verbose output from stow"
+  echo "  --adopt          Adopt existing files into package directory"
   echo "  --help           Show this help message"
   echo
   echo -e "${BLUE}Examples:${RESET}"
@@ -48,6 +49,7 @@ TARGET_DIR="$HOME"      # Where dotfiles will be stowed (usually $HOME)
 ACTION="--stow"         # Default action is to stow (link files)
 DRY_RUN=false           # If true, only simulate actions
 VERBOSE=false           # If true, show verbose output
+ADOPT=false             # If true, adopt existing files into package
 STOW_DIRS=()            # List of packages to stow
 
 # ----------------------------
@@ -65,6 +67,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --verbose)
       VERBOSE=true      # Enable verbose output
+      shift
+      ;;
+    --adopt)
+      ADOPT=true        # Enable adopt mode
       shift
       ;;
     --help)
@@ -108,6 +114,7 @@ echo -e "${BLUE}Target directory:  ${RESET} $TARGET_DIR"
 echo -e "${BLUE}Action:            ${RESET} $ACTION"
 $DRY_RUN && echo -e "${YELLOW}Dry-run enabled${RESET}"
 $VERBOSE && echo -e "${BLUE}Verbose output:    ${RESET} enabled"
+$ADOPT && echo -e "${YELLOW}Adopt mode enabled${RESET}"
 echo -e "${BLUE}Packages:          ${RESET} ${STOW_DIRS[*]}"
 echo
 
@@ -118,6 +125,7 @@ for dir in "${STOW_DIRS[@]}"; do
   echo -e "${GREEN}Processing: $dir${RESET}"
   CMD=(stow --target="$TARGET_DIR" --dir="$DOTFILES_DIR" "$ACTION")
   $VERBOSE && CMD+=("--verbose")
+  $ADOPT && CMD+=("--adopt")
   CMD+=("$dir")
 
   if $DRY_RUN; then
