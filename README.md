@@ -46,6 +46,7 @@ cd dotfiles
 | `--uninstall` | Remove symlinks instead of stow  |
 | `--dry-run`   | Show actions without applying    |
 | `--verbose`   | Show detailed output from stow   |
+| `--adopt`     | Adopt existing files into package|
 | `--help`      | Display help message             |
 
 **Examples:**
@@ -66,6 +67,7 @@ cd dotfiles
 |-----------|--------------------------------------|
 | bash      | Bash shell configuration             |
 | bin       | User scripts and binaries            |
+| claude    | Claude Code configuration and commands|
 | dolphin   | KDE Dolphin file manager             |
 | espanso   | Text expander                        |
 | git       | Git configuration                    |
