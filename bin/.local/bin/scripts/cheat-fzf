@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+CHEAT_DIR="$HOME/sync/obsidian/devops/cheat-sheet/"
+
+# Checar se a pasta existe
+if [ ! -d "$CHEAT_DIR" ]; then
+  echo "❌ Diretório $CHEAT_DIR não encontrado."
+  exit 1
+fi
+
+# Mapear nome base (sem extensão) → caminho completo
+declare -A cheat_map
+
+while IFS= read -r file; do
+  base=$(basename "$file" .md)
+  cheat_map["$base"]="$file"
+done < <(find "$CHEAT_DIR" -type f -name "*.md")
+
+# Menu interativo com fzf
+selected=$(printf "%s\n" "${!cheat_map[@]}" | sort | fzf --prompt="🧠 Selecione um cheat: ")
+
+# Se algo foi selecionado, renderiza com a melhor ferramenta disponível
+if [ -n "$selected" ]; then
+  file="${cheat_map["$selected"]}"
+
+  if command -v glow &>/dev/null; then
+    glow -p "$file"
+  elif command -v mdcat &>/dev/null; then
+    mdcat "$file"
+  elif command -v bat &>/dev/null; then
+    bat --style=plain --paging=always "$file"
+  else
+    less "$file"
+  fi
+fi
