@@ -40,8 +40,8 @@ mason_lspconfig.setup({
 		"terraformls",
 		"yamlls",
 	},
-	-- auto-install configured servers (with lspconfig)
-	automatic_installation = true, -- not the same as ensure_installed
+	-- We control server enabling via vim.lsp.enable() in lsp.lua
+	automatic_enable = false,
 })
 
 mason_tool_installer.setup({

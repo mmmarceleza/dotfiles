@@ -2,20 +2,17 @@
 --                                    Language Server Protocol
 ----------------------------------------------------------------------------------------------------
 -- References:
---   - https://microsoft.github.io/language-server-protocol/
---   - https://github.com/neovim/nvim-lspconfig
---   - https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+--   - https://neovim.io/doc/user/lsp.html
+--   - https://gpanders.com/blog/whats-new-in-neovim-0-11/
 
-local status_ok, _ = pcall(require, "lspconfig")
-if not status_ok then
-	return
-end
-
+------------------------------------
+-- Diagnostic signs configuration
+------------------------------------
 local signs = {
-	Hint = " ",
-	Info = " ",
-	Warn = " ",
-	Error = " ",
+	Hint = " ",
+	Info = " ",
+	Warn = " ",
+	Error = " ",
 }
 
 for type, icon in pairs(signs) do
@@ -23,109 +20,34 @@ for type, icon in pairs(signs) do
 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
 
-----------------------
--- Lua language server
-----------------------
--- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
--- https://luals.github.io/
--- https://luals.github.io/#neovim-install
--- pacman -S lua-language-server
-require("lspconfig").lua_ls.setup({
-	settings = {
-		Lua = {
-			diagnostics = {
-				globals = { "vim" }, -- ignore vim as global variable
-			},
-		},
-	},
+------------------------------------
+-- Global LSP configuration
+------------------------------------
+-- Get enhanced capabilities from cmp-nvim-lsp
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+local cmp_lsp_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+if cmp_lsp_ok then
+	capabilities = vim.tbl_deep_extend("force", capabilities, cmp_nvim_lsp.default_capabilities())
+end
+
+-- Apply global settings to all LSP servers
+vim.lsp.config("*", {
+	capabilities = capabilities,
+	root_markers = { ".git" },
 })
 
----------------------------------
--- Google's lsp server for golang
----------------------------------
--- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#gopls
--- https://github.com/golang/tools/tree/master/gopls
--- pacman -S gopls
-require("lspconfig").gopls.setup({})
-
----------------------------------
--- Language Server for YAML Files
----------------------------------
--- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#yamlls
--- https://github.com/redhat-developer/yaml-language-server
--- pacman -S yaml-language-server
-require("lspconfig").yamlls.setup({
-	settings = {
-		yaml = {
-			schemas = {
-				kubernetes = {
-					"*namespace*.yaml",
-					"*pod*.yaml",
-					"*deploy*.yaml",
-					"*daemonset*.yaml",
-					"*statefulset*.yaml",
-					"*service*.yaml",
-					"*ingress*.yaml",
-					"*configmap*.yaml",
-					"*secret*.yaml",
-					"*hpa*.yaml",
-					"*pv*.yaml",
-					"*cronjob*.yaml",
-					"*job*.yaml",
-				},
-				--["http://json.schemastore.org/github-workflow"] = ".github/workflows/*",
-				--["http://json.schemastore.org/github-action"] = ".github/action.{yml,yaml}",
-				--["http://json.schemastore.org/ansible-stable-2.9"] = "roles/tasks/*.{yml,yaml}",
-				--["http://json.schemastore.org/prettierrc"] = ".prettierrc.{yml,yaml}",
-				--["http://json.schemastore.org/kustomization"] = "kustomization.{yml,yaml}",
-				--["http://json.schemastore.org/ansible-playbook"] = "*play*.{yml,yaml}",
-				--["http://json.schemastore.org/chart"] = "Chart.{yml,yaml}",
-				--["https://json.schemastore.org/dependabot-v2"] = ".github/dependabot.{yml,yaml}",
-				--["https://json.schemastore.org/gitlab-ci"] = "*gitlab-ci*.{yml,yaml}",
-				--["https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.1/schema.json"] = "*api*.{yml,yaml}",
-				["https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json"] = "*docker-compose*.{yml,yaml}",
-				["https://raw.githubusercontent.com/argoproj/argo-workflows/master/api/jsonschema/schema.json"] = "*flow*.{yml,yaml}",
-				["https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj/application_v1alpha1.json"] = "*application*.{yml,yaml}",
-				["https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json"] = "*helmrelease*.{yml,yaml}",
-				["https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrepository-source-v1beta1.json"] = "*helmrepository*.{yml.yaml}",
-			},
-		},
-	},
+------------------------------------
+-- Enable LSP servers
+------------------------------------
+-- Server configs are in ~/.config/nvim/lsp/
+vim.lsp.enable({
+	"lua_ls",
+	"gopls",
+	"yamlls",
+	"helm_ls",
+	"terraformls",
+	"bashls",
 })
-
---------------------------------
--- Helm Language Server Protocol
---------------------------------
--- https://github.com/mrjosh/helm-ls
-require("lspconfig").helm_ls.setup({
-	settings = {
-		["helm-ls"] = {
-			yamlls = {
-				path = "yaml-language-server",
-			},
-		},
-	},
-})
-
-----------------------------
--- Terraform Language Server
-----------------------------
--- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#terraformls
--- https://github.com/hashicorp/terraform-ls
--- paru -S terraform-ls-bin (AUR)
-require("lspconfig").terraformls.setup({
-	filetypes = {
-		"terraform", --[[ "terraform-vars" ]]
-	}, -- test terraform-vars in the future (https://github.com/hashicorp/terraform-ls/issues/1464)
-})
-
------------------------
--- Bash Language Server
------------------------
--- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#bashls
--- https://github.com/koalaman/shellcheck (dependency)
--- pacman -S bash-language-server shellcheck
-require("lspconfig").bashls.setup({})
 
 ------------------
 -- Global mappings
@@ -161,9 +83,11 @@ vim.diagnostic.config({
 	virtual_text = false,
 	float = {
 		focusable = false,
-		source = "always", -- Or "if_many"
+		source = "always",
 		border = "rounded",
 	},
 })
--- Some usefull commands
--- :LspInfo
+
+-- Useful commands:
+-- :checkhealth lsp
+-- :lua vim.print(vim.lsp.config.lua_ls)
