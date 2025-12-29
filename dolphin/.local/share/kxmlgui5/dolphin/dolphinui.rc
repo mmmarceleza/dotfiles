@@ -86,6 +86,7 @@
   <Action name="go_forward"/>
   <Action name="view_redisplay"/>
   <Action name="options_show_menubar"/>
+  <Action name="renamefile"/>
   <Separator name="separator_0"/>
   <Action name="bookmarks"/>
   <Action name="icons"/>
