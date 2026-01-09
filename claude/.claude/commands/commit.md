@@ -1,6 +1,6 @@
 ---
 description: Create a git commit analyzing code changes with conventional commit format
-allowed-tools: Bash(git:*), AskUserQuestion
+allowed-tools: Bash(git:*), Bash(acli:*), AskUserQuestion
 ---
 
 # Git Commit
@@ -32,10 +32,16 @@ Examine the staged changes using `git diff --cached`:
 
 ### Step 4: Check for Jira Reference
 Extract the Jira ticket from the branch name if present:
-- Look for patterns like `RUN-1234`, `PROJ-567` at the start of the branch name
+- Look for patterns like `PROJ-1234`, `TEAM-567` at the start of the branch name
 - This will be added to the commit body
 
-### Step 5: Compose Commit Message
+### Step 5: Validate Jira Ticket (if found)
+If a Jira ticket was extracted from the branch:
+1. Validate it exists: `acli jira workitem view <TICKET> --output json`
+2. If valid, you may use the issue summary to help write a better commit message
+3. If invalid, warn the user but continue (the ticket might be from another Jira instance)
+
+### Step 6: Compose Commit Message
 Create a commit message following these rules:
 
 **Format:**
@@ -63,7 +69,7 @@ feat(auth): add OAuth2 login support
 
 Implement Google and GitHub OAuth2 providers for user authentication.
 
-Refs: RUN-1234
+Refs: PROJ-1234
 ```
 
 ```
@@ -82,7 +88,7 @@ refactor: simplify database connection pooling
 Reduce complexity by using built-in connection pool manager.
 ```
 
-### Step 6: Confirm with User
+### Step 7: Confirm with User
 **Always show the proposed commit message and ask for user confirmation before committing.**
 
 Display the full commit message and ask:
@@ -90,7 +96,7 @@ Display the full commit message and ask:
 
 If the user wants changes, adjust accordingly and confirm again.
 
-### Step 7: Create Commit
+### Step 8: Create Commit
 Once confirmed, create the commit using a heredoc to preserve formatting:
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -99,8 +105,17 @@ EOF
 )"
 ```
 
-### Step 8: Confirm Success
+### Step 9: Confirm Success
 Show the result of the commit and the new commit hash.
+
+### Step 10: Add Jira Comment (Optional)
+If a valid Jira ticket was found, ask the user:
+"Do you want to add a comment to <TICKET> with the commit info?"
+
+If yes, run:
+```bash
+acli jira workitem comment <TICKET> --body "Commit: <short-hash> - <subject>"
+```
 
 ## Conventional Commit Types Reference
 - **feat**: A new feature

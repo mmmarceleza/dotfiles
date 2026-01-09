@@ -24,6 +24,9 @@ AutoCopySelectedText=true
 DropUrlsAsText=false
 UnderlineFilesEnabled=true
 
+[Keyboard]
+KeyBindings=default
+
 [Scrolling]
 HistoryMode=1
 HistorySize=999999

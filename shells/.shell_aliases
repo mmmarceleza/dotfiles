@@ -71,9 +71,6 @@ alias tgss='terragrunt state show'
 # alias myprs='gh search prs --assignee=@me --state=open'
 # alias mylastcommits='gh search commits --author=mmmarceleza --author-date=">$(date --date='-30 days' +"%Y-%m-%d")"'
 
-# alias to manage my dotfiles -- https://github.com/mmmarceleza/dotfiles
-alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-
 # weather
 alias weather='curl wttr.in/ipatinga'
 
