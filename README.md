@@ -76,7 +76,6 @@ cd dotfiles
 |-----------|--------------------------------------|
 | bash      | Bash shell configuration             |
 | bin       | User scripts and binaries            |
-| claude    | Claude Code configuration and commands|
 | dolphin   | KDE Dolphin file manager             |
 | espanso   | Text expander                        |
 | git       | Git configuration                    |
