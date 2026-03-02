@@ -17,7 +17,8 @@
 
 # Prerequisites
 
-- [GNU Stow](https://www.gnu.org/software/stow/)
+- [GNU Stow](https://www.gnu.org/software/stow/) >= 2.3.0
+- [Git](https://git-scm.com/) (used for `--adopt` safety check)
 
 ---
 
@@ -41,23 +42,31 @@ cd dotfiles
 
 **Options:**
 
-| Option        | Description                      |
-|---------------|----------------------------------|
-| `--uninstall` | Remove symlinks instead of stow  |
-| `--dry-run`   | Show actions without applying    |
-| `--verbose`   | Show detailed output from stow   |
-| `--adopt`     | Adopt existing files into package|
-| `--help`      | Display help message             |
+| Option          | Description                                              |
+|-----------------|----------------------------------------------------------|
+| `--uninstall`   | Remove symlinks instead of stow                         |
+| `--restow`      | Unstow then re-stow (cleans up stale symlinks)          |
+| `--dry-run`     | Simulate actions without applying                        |
+| `--verbose`     | Show detailed output from stow                           |
+| `--adopt`       | Adopt existing files into package (with safety warning)  |
+| `--backup`      | Back up conflicting files before stowing                 |
+| `--folding`     | Allow directory symlinks (off by default)                |
+| `--list`        | List all packages and their stow status                  |
+| `--help`        | Display help message                                     |
 
 **Examples:**
 
 ```bash
-./stow.sh                     # Apply all dotfiles
-./stow.sh bash nvim           # Apply specific packages
-./stow.sh --uninstall nvim    # Remove symlinks for nvim
-./stow.sh --dry-run wezterm   # Preview changes without applying
-./stow.sh --verbose           # Apply all with detailed output
+./stow.sh                        # Apply all dotfiles
+./stow.sh bash nvim              # Apply specific packages
+./stow.sh --uninstall nvim       # Remove symlinks for nvim
+./stow.sh --restow bash          # Clean up stale symlinks
+./stow.sh --backup bash          # Back up conflicts, then stow
+./stow.sh --dry-run wezterm      # Preview changes without applying
+./stow.sh --list                 # Show stowed/not-stowed status
 ```
+
+> For detailed documentation including flowcharts, hook examples, and troubleshooting, see [docs/stow.md](docs/stow.md).
 
 ---
 
@@ -79,7 +88,6 @@ cd dotfiles
 | tmux      | Tmux terminal multiplexer            |
 | vim       | Vim configuration                    |
 | wezterm   | WezTerm terminal emulator            |
-| zellij    | Zellij terminal multiplexer          |
 | zsh       | Zsh shell configuration              |
 
 ---

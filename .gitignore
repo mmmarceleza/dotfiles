@@ -1,3 +1,4 @@
 download-binaries/
 bin/.local/bin/*
 !bin/.local/bin/scripts/
+.backups/
