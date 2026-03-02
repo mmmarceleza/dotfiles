@@ -86,7 +86,7 @@ By default, `stow.sh` passes `--no-folding` to stow. This means stow creates sym
 
 ```mermaid
 graph LR
-    subgraph "With folding (risky)"
+    subgraph "Folding ON (risky)"
         A["~/.config/nvim/ → dotfiles/nvim/.config/nvim/"]
         B["App writes cache file"] --> A
         C["Cache file lands in your repo!"]
@@ -95,7 +95,7 @@ graph LR
 
 ```mermaid
 graph LR
-    subgraph "Without folding (default, safe)"
+    subgraph "Folding OFF (default)"
         D["~/.config/nvim/ (real directory)"]
         E["~/.config/nvim/init.lua → dotfiles/..."]
         F["App writes cache file → stays in real dir"]
