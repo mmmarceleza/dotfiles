@@ -57,6 +57,7 @@ else
 fi
 
 # Terragrunt
+export TG_DOWNLOAD_DIR="$HOME/.cache/terragrunt"
 alias tgi='terragrunt init'
 alias tgp='terragrunt plan'
 alias tga='terragrunt apply'
