@@ -136,7 +136,7 @@ check_stow_status() {
     local rel="${file#"$pkg_dir"/}"
     local target="$HOME/$rel"
     ((total++)) || true
-    if [[ -L "$target" ]]; then
+    if [[ -e "$target" ]]; then
       local link_dest
       link_dest="$(readlink -f "$target" 2>/dev/null)" || continue
       if [[ "$link_dest" == "$pkg_dir/"* ]]; then
