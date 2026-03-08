@@ -186,7 +186,7 @@ backup_conflicts() {
   sim_output="$("${sim_cmd[@]}" 2>&1)" || true
 
   local conflicts
-  conflicts="$(echo "$sim_output" | grep -oP '(?<=over existing target )\S+(?= since neither)' || true)"
+  conflicts="$(echo "$sim_output" | grep -oP '(?<=over existing target )\S+(?= since neither)|(?<=existing target is not owned by stow: )\S+' || true)"
   [[ -z "$conflicts" ]] && return 0
 
   local backup_dir
