@@ -136,7 +136,7 @@ check_stow_status() {
     local rel="${file#"$pkg_dir"/}"
     local target="$HOME/$rel"
     ((total++)) || true
-    if [[ -L "$target" ]]; then
+    if [[ -e "$target" ]]; then
       local link_dest
       link_dest="$(readlink -f "$target" 2>/dev/null)" || continue
       if [[ "$link_dest" == "$pkg_dir/"* ]]; then
@@ -186,7 +186,7 @@ backup_conflicts() {
   sim_output="$("${sim_cmd[@]}" 2>&1)" || true
 
   local conflicts
-  conflicts="$(echo "$sim_output" | grep -oP '(?<=over existing target )\S+(?= since neither)' || true)"
+  conflicts="$(echo "$sim_output" | grep -oP '(?<=over existing target )\S+(?= since neither)|(?<=existing target is not owned by stow: )\S+' || true)"
   [[ -z "$conflicts" ]] && return 0
 
   local backup_dir
