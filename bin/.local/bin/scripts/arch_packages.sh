@@ -7,8 +7,9 @@
 #
 # --------------------------------------------------------------
 # Installs package sets for an Arch Linux workstation using
-# official repositories, AUR (via yay), Flatpak, and user-scoped
-# Python packages. Packages are grouped by segment so the
+# official repositories, AUR (via paru), and user-scoped Python
+# packages. Flatpak support is built in but currently unused.
+# Packages are grouped by segment so the
 # environment can be installed selectively without editing the
 # script.
 #
@@ -26,11 +27,11 @@
 #   - pacman
 #   - sudo
 #   - systemd (for optional unit enablement)
-#   - flatpak (only when Flatpak segments are selected)
+#   - flatpak (only if Flatpak packages are added to FLATPAK_SEGMENTS)
 #
 # Notes:
-#   - AUR packages are installed via yay, bootstrapped automatically
-#   - Python extras use pip --user for the target user
+#   - AUR packages are installed via paru, bootstrapped automatically
+#   - Python tools are installed with pipx (isolated virtual environments)
 #   - Docker/libvirt services are enabled only when their segment
 #     is selected
 #   - A log file is written to /tmp/arch_packages_<timestamp>.log
@@ -41,17 +42,17 @@
 #   v1.0 2026-03-28, Marcelo Marques Melo:
 #       - Initial Arch-focused version derived from manjaro_packages.sh
 #       - Organized packages into selectable segments
-#       - Uses yay as AUR helper (compiled from source to avoid libalpm breakage)
-#       - Removed Snap entirely (migrated to Flatpak/AUR)
+#       - Uses paru as AUR helper (compiled from source to avoid libalpm breakage)
+#       - Removed Snap entirely (migrated to AUR/official repos)
 #       - Added segment selection (--all, --segment, --without)
 #       - Added auto-detection of target user
 #       - Added Flatpak remote bootstrapping
-#       - Added conditional post-install (systemd, groups, vagrant)
+#       - Added conditional post-install (systemd, groups)
 #       - Added ERR trap with line number and command logging
 #       - Added log file output via tee
 #       - Added pre-flight checks (Arch detection, network, db lock)
 #       - Added package existence validation before install
-#       - Added retry wrapper for pacman/yay calls
+#       - Added retry wrapper for pacman/paru calls
 #       - Added keyring refresh before system upgrade
 #       - Added sudo credential caching with keep-alive
 #
@@ -59,6 +60,30 @@
 # --------------------------------------------------------------
 
 set -euo pipefail
+
+# --- Stale sudoers cleanup --------------------------------------------------
+# If a previous run was killed with SIGKILL, the temporary NOPASSWD sudoers
+# file may still exist. Remove it before doing anything else.
+
+SUDOERS_TMPFILE="/etc/sudoers.d/zzz-arch-packages-tmp"
+if [[ -f "$SUDOERS_TMPFILE" ]]; then
+  sudo rm -f "$SUDOERS_TMPFILE"
+fi
+
+# ###########################################################################
+# #                        Terminal Output Helpers                         #
+# ###########################################################################
+
+# --- Color definitions -----------------------------------------------------
+# Wrapped with fallback so the script works in non-interactive environments
+# (e.g. piped output, cron, CI). Defined before the ERR trap so the trap
+# can reference them safely.
+
+red=$(tput setaf 1 2>/dev/null || true)
+yellow=$(tput setaf 3 2>/dev/null || true)
+green=$(tput setaf 2 2>/dev/null || true)
+blue=$(tput setaf 4 2>/dev/null || true)
+reset=$(tput sgr0 2>/dev/null || true)
 
 # ###########################################################################
 # #                     Error Handling and Logging                         #
@@ -76,20 +101,6 @@ trap 'echo "${red}Error on line $LINENO:${reset} $BASH_COMMAND" >&2' ERR
 
 LOG_FILE="/tmp/arch_packages_$(date +%Y%m%d_%H%M%S).log"
 exec > >(tee -a "$LOG_FILE") 2>&1
-
-# ###########################################################################
-# #                        Terminal Output Helpers                         #
-# ###########################################################################
-
-# --- Color definitions -----------------------------------------------------
-# Wrapped with fallback so the script works in non-interactive environments
-# (e.g. piped output, cron, CI).
-
-red=$(tput setaf 1 2>/dev/null || true)
-yellow=$(tput setaf 3 2>/dev/null || true)
-green=$(tput setaf 2 2>/dev/null || true)
-blue=$(tput setaf 4 2>/dev/null || true)
-reset=$(tput sgr0 2>/dev/null || true)
 
 # --- Print functions -------------------------------------------------------
 
@@ -160,7 +171,9 @@ declare -A SEGMENT_DESCRIPTIONS=(
   ["desktop-apps"]="Desktop productivity and general-purpose GUI apps"
   ["media-creative"]="Creative, recording and media tooling"
   ["communication"]="Chat, notes and collaboration apps"
-  ["gaming"]="Gaming, emulation and Wine stack"
+  ["gaming"]="Common gaming packages (Steam, Wine)"
+  ["gaming-intel"]="32-bit Intel GPU libraries for gaming"
+  ["gaming-nvidia"]="32-bit NVIDIA GPU libraries for gaming"
   ["fonts"]="Nerd fonts and terminal fonts"
   ["python-user"]="Python CLI tools installed with pipx"
 )
@@ -176,6 +189,8 @@ ALL_SEGMENTS=(
   "media-creative"
   "communication"
   "gaming"
+  "gaming-intel"
+  "gaming-nvidia"
   "fonts"
   "python-user"
 )
@@ -193,59 +208,66 @@ ALL_SEGMENTS=(
 
 declare -A PACMAN_SEGMENTS=(
   ["base-cli"]="
-    base-devel bash-completion bat btop chafa fd fzf jq lesspipe make
-    mediainfo neovim nodejs npm perl-image-exiftool python-pip
-    python-tabulate ripgrep rsync starship stow tailspin tldr tmux tree
-    unzip vim yazi zellij zoxide
+    bash-completion bat btop chafa fd fzf glow jless jq lesspipe mediainfo
+    ncdu neovim nodejs npm pass python-pip ripgrep rsync sshfs starship
+    stow tailspin tldr tmux tree unzip wget yazi zellij zoxide
   "
   ["shell-tools"]="
     eza git-delta ipcalc kdiff3 lazygit ldns lsd meld openbsd-netcat rclone
-    xclip xdotool xsel
+    wl-clipboard xclip xsel ydotool
   "
   ["devops-k8s"]="
-    actionlint argocd cosign crane dive github-cli go go-yq helm k9s
-    kubectx mariadb-clients terraform trivy vault
+    actionlint argocd cloudflared cosign crane dive github-cli go go-yq helm
+    k9s kubeconform kubectx kustomize mariadb-clients terraform terragrunt
+    trivy vault
   "
   ["containers-virt"]="
     buildah docker docker-compose podman qemu-full virt-manager
   "
   ["network-security"]="
-    mtr openfortivpn tailscale whois wireguard-tools
+    mtr nmap openfortivpn tailscale whois wireguard-tools
   "
   ["desktop-apps"]="
-    flatpak keepassxc qbittorrent scrcpy syncthing wezterm xca
+    firefox keepassxc libreoffice-still libreoffice-still-pt-br obsidian
+    pdfarranger qbittorrent scrcpy syncthing wezterm xca
   "
   ["media-creative"]="
-    inkscape peek
+    audacity drawio-desktop inkscape kdenlive obs-studio vlc
   "
   ["communication"]="
-    discord telegram-desktop
+    telegram-desktop
   "
   ["gaming"]="
-    lib32-mesa lib32-vulkan-intel steam wine wine-gecko wine-mono winetricks
+    gamemode lib32-gamemode steam wine wine-gecko wine-mono winetricks
+  "
+  ["gaming-intel"]="
+    lib32-mesa lib32-vulkan-intel
+  "
+  ["gaming-nvidia"]="
+    lib32-nvidia-utils
   "
   ["fonts"]="
-    ttf-hack-nerd ttf-jetbrains-mono-nerd
+    noto-fonts noto-fonts-emoji ttf-hack-nerd ttf-jetbrains-mono-nerd
+    ttf-liberation
   "
 )
 
-# --- AUR (via yay) ---------------------------------------------------------
+# --- AUR (via paru) --------------------------------------------------------
 # Packages not available in the official repositories. The script bootstraps
-# yay automatically when AUR packages are part of the active segments.
+# paru automatically when AUR packages are part of the active segments.
 
 declare -A AUR_SEGMENTS=(
   ["devops-k8s"]="
-    aws-cli-bin grype-bin hadolint-bin kind-bin kubepug-bin kubeval-bin
-    okd-client-bin tfautomv-bin velero-bin
-  "
-  ["containers-virt"]="
-    vagrant
+    aws-cli-bin grype-bin hadolint-bin kind-bin velero-bin
   "
   ["network-security"]="
     cloudflare-warp-bin
   "
   ["desktop-apps"]="
-    brave-bin espanso-x11-bin obsidian-bin visual-studio-code-bin
+    brave-bin google-chrome jdownloader2 visual-studio-code-bin
+  "
+  ["communication"]="
+    slack-desktop
   "
 )
 
@@ -253,28 +275,7 @@ declare -A AUR_SEGMENTS=(
 # GUI applications where the Flatpak packaging is lower friction or provides
 # better sandboxing than the AUR alternative.
 
-declare -A FLATPAK_SEGMENTS=(
-  ["desktop-apps"]="
-    com.google.Chrome
-    com.github.jeromerobert.pdfarranger
-    org.jdownloader.JDownloader
-  "
-  ["media-creative"]="
-    com.jgraph.drawio.desktop
-    com.obsproject.Studio
-    org.audacityteam.Audacity
-    org.kde.kdenlive
-    org.videolan.VLC
-  "
-  ["communication"]="
-    com.slack.Slack
-    com.spotify.Client
-    com.todoist.Todoist
-  "
-  ["gaming"]="
-    net.pcsx2.PCSX2
-  "
-)
+declare -A FLATPAK_SEGMENTS=()
 
 # --- User-scoped Python packages -------------------------------------------
 # Installed with pipx so each tool gets its own virtual environment.
@@ -540,15 +541,15 @@ check_pacman_lock() {
 # so the user is not prompted again during a long install run.
 
 SUDO_KEEPALIVE_PID=""
-SUDOERS_TMPFILE=""
 
 start_sudo_keepalive() {
   # Prompt for password once
   sudo -v || abort "Failed to obtain sudo credentials"
 
   # Grant the target user temporary passwordless sudo so that AUR helpers
-  # (yay, makepkg) can call pacman without a terminal for password input.
-  SUDOERS_TMPFILE="/etc/sudoers.d/zzz-arch-packages-tmp"
+  # (paru, makepkg) can call pacman without a terminal for password input.
+  # SUDOERS_TMPFILE is declared at the top of the script so the stale-file
+  # cleanup can reference it before this function runs.
   echo "$TARGET_USER ALL=(ALL) NOPASSWD: ALL" | sudo tee "$SUDOERS_TMPFILE" > /dev/null
   sudo chmod 440 "$SUDOERS_TMPFILE"
 
@@ -615,27 +616,27 @@ ensure_flatpak_remote() {
   fi
 }
 
-# --- Yay (AUR helper) ------------------------------------------------------
-# Install yay only when AUR packages are part of the active segments.
-# Compiled from source (not yay-bin) to link against the current libalpm.
+# --- Paru (AUR helper) -----------------------------------------------------
+# Install paru only when AUR packages are part of the active segments.
+# Compiled from source (not paru-bin) to link against the current libalpm.
 # Precompiled -bin packages break when pacman bumps the libalpm soname.
 
-ensure_yay() {
-  if command -v yay >/dev/null 2>&1; then
+ensure_paru() {
+  if command -v paru >/dev/null 2>&1; then
     return
   fi
 
-  title "Bootstrapping yay"
-  sudo pacman -S --needed --noconfirm base-devel git go
+  title "Bootstrapping paru"
+  sudo pacman -S --needed --noconfirm base-devel git rust
 
   local temp_dir
-  temp_dir=$(run_as_target_user mktemp -d /tmp/yay-bootstrap.XXXXXX)
+  temp_dir=$(run_as_target_user mktemp -d /tmp/paru-bootstrap.XXXXXX)
   # Clean up the temp directory when the function returns
   trap 'rm -rf "$temp_dir"' RETURN
 
-  run_as_target_user git clone https://aur.archlinux.org/yay.git "$temp_dir/yay"
-  run_as_target_user bash -lc "cd '$temp_dir/yay' && makepkg -s --noconfirm"
-  sudo pacman -U --noconfirm "$temp_dir"/yay/yay-*.pkg.tar.*
+  run_as_target_user git clone https://aur.archlinux.org/paru.git "$temp_dir/paru"
+  run_as_target_user bash -lc "cd '$temp_dir/paru' && makepkg -s --noconfirm"
+  sudo pacman -U --noconfirm "$temp_dir"/paru/paru-*.pkg.tar.*
 }
 
 # ###########################################################################
@@ -670,7 +671,7 @@ validate_pacman_packages() {
 
 # --- Retry wrapper ----------------------------------------------------------
 # Retries a command up to MAX_RETRIES times with a short delay between
-# attempts. Useful for pacman/yay calls that can fail due to transient
+# attempts. Useful for pacman/paru calls that can fail due to transient
 # network issues or overloaded mirrors.
 
 MAX_RETRIES=3
@@ -735,21 +736,6 @@ add_user_to_group() {
   sudo usermod -aG "$group_name" "$TARGET_USER"
 }
 
-# --- Vagrant plugin ---------------------------------------------------------
-# Install the vagrant-libvirt plugin if vagrant is available.
-
-install_vagrant_plugin() {
-  command -v vagrant >/dev/null 2>&1 || return
-
-  if run_as_target_user vagrant plugin list | grep -q '^vagrant-libvirt '; then
-    info "vagrant-libvirt plugin is already installed"
-    return
-  fi
-
-  title "Installing vagrant-libvirt plugin"
-  run_as_target_user vagrant plugin install vagrant-libvirt
-}
-
 # ###########################################################################
 # #                        Main Execution Flow                             #
 # ###########################################################################
@@ -791,10 +777,11 @@ main() {
   mapfile -t flatpak_packages < <(collect_packages flatpak)
   mapfile -t python_packages < <(collect_packages python)
 
-  # --- Enable multilib if gaming segment is active ---------------------------
-  # Steam and 32-bit Wine libraries require the multilib repository.
+  # --- Enable multilib if any gaming segment is active -----------------------
+  # Steam, 32-bit Wine libraries, and 32-bit GPU libs require the multilib
+  # repository.
 
-  if contains_segment "gaming"; then
+  if contains_segment "gaming" || contains_segment "gaming-intel" || contains_segment "gaming-nvidia"; then
     ensure_multilib
   fi
 
@@ -824,9 +811,9 @@ main() {
   # --- Install AUR packages -------------------------------------------------
 
   if [[ ${#aur_packages[@]} -gt 0 ]]; then
-    ensure_yay
+    ensure_paru
     title "Installing ${#aur_packages[@]} AUR packages"
-    retry run_as_target_user yay -Syu --noconfirm --needed "${aur_packages[@]}"
+    retry run_as_target_user paru -Syu --noconfirm --needed "${aur_packages[@]}"
   fi
 
   # --- Install Flatpak packages ---------------------------------------------
@@ -857,7 +844,6 @@ main() {
     enable_unit_if_available libvirtd.service
     add_user_to_group docker
     add_user_to_group libvirt
-    install_vagrant_plugin
   fi
 
   # --- Done -----------------------------------------------------------------
