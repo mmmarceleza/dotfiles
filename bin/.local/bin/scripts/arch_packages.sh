@@ -813,7 +813,7 @@ main() {
   if [[ ${#aur_packages[@]} -gt 0 ]]; then
     ensure_paru
     title "Installing ${#aur_packages[@]} AUR packages"
-    retry run_as_target_user paru -Syu --noconfirm --needed "${aur_packages[@]}"
+    retry run_as_target_user paru -Syu --noconfirm --skipreview --needed "${aur_packages[@]}"
   fi
 
   # --- Install Flatpak packages ---------------------------------------------
