@@ -627,7 +627,7 @@ ensure_paru() {
   fi
 
   title "Bootstrapping paru"
-  sudo pacman -S --needed --noconfirm base-devel git rust
+  sudo pacman -S --needed --noconfirm base-devel ca-certificates git rust
 
   local temp_dir
   temp_dir=$(run_as_target_user mktemp -d /tmp/paru-bootstrap.XXXXXX)
