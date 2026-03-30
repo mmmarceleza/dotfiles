@@ -1,28 +1,75 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# k8s-setup.sh - Bootstrap Kubernetes development tooling
+#
+# Author:      Marcelo Marques Melo
+#
+# --------------------------------------------------------------
+# Sets up a Kubernetes development environment by installing:
+#   - krew (kubectl plugin manager) and selected plugins
+#   - Helm chart repositories
+#   - hcl2json (HCL to JSON converter)
+#   - kubescape (Kubernetes security scanner)
+#
+# Binaries are downloaded to ~/.local/bin/download-binaries and
+# symlinked into ~/.local/bin for PATH availability.
+#
+# Usage:
+#   ./k8s-setup.sh [options]
+#
+# Examples:
+#   ./k8s-setup.sh                # Install everything
+#   ./k8s-setup.sh --skip-krew    # Skip krew and plugins
+#   ./k8s-setup.sh --skip-helm    # Skip helm repositories
+#   ./k8s-setup.sh --dry-run      # Show what would be done
+#
+# Dependencies:
+#   - curl
+#   - jq
+#   - kubectl
+#   - helm
+#   - tar
+#
+# --------------------------------------------------------------
+# Changelog:
+#
+#   v2.0 2026-03-30, Marcelo Marques Melo:
+#       - Rewrite following bash best practices
+#       - Add argument parsing, dependency checks, dry-run mode
+#       - Detect architecture automatically for all downloads
+#       - Add structured logging and error handling
+#
+#   v1.0 2024-01-01, Marcelo Marques Melo:
+#       - Initial version
+#
+# License: MIT
+# --------------------------------------------------------------
 
-# Teleport client version to download
-# TELEPORT_VERSION="14.3.32"
+set -euo pipefail
 
-# Default path to download binaries (it is listed in the .gitignore)
-BIN_DIR="$HOME/.local/bin/download-binaries"
-mkdir -p "$BIN_DIR"
+# --- Global constants ---------------------------------------------------------
 
-# krew plugins to use in the system (https://krew.sigs.k8s.io/plugins/)
-KREW_PLUGINS=(
-  "access-matrix"     # https://github.com/corneliusweig/rakkess/blob/master/doc/USAGE.md 
-  "ca-cert"           # https://github.com/ahmetb/kubectl-extras
-  "deprecations"      # https://github.com/kubepug/kubepug 
-  "explore"           # https://github.com/keisku/kubectl-explore
-  "get-all"           # https://github.com/corneliusweig/ketall
-  "ingress-nginx"     # https://kubernetes.github.io/ingress-nginx/kubectl-plugin/
-  "kubescape"         # https://github.com/kubescape/kubescape/
-  "marvin"            # https://github.com/undistro/marvin
-  "popeye"            # https://popeyecli.io/
-  "resource-capacity" # https://github.com/robscott/kube-capacity
-  "view-cert")        # https://github.com/lmolas/kubectl-view-cert
+readonly SCRIPT_NAME="${BASH_SOURCE[0]##*/}"
 
-# Helm repositories to use in the system
-HELM_REPOS=(
+readonly BIN_DIR="${HOME}/.local/bin/download-binaries"
+readonly LINK_DIR="${HOME}/.local/bin"
+readonly KREW_DIR="${HOME}/.krew/bin"
+
+readonly KREW_PLUGINS=(
+  "access-matrix"      # https://github.com/corneliusweig/rakkess
+  "ca-cert"            # https://github.com/ahmetb/kubectl-extras
+  "deprecations"       # https://github.com/kubepug/kubepug
+  "explore"            # https://github.com/keisku/kubectl-explore
+  "get-all"            # https://github.com/corneliusweig/ketall
+  "ingress-nginx"      # https://kubernetes.github.io/ingress-nginx/kubectl-plugin/
+  "kubescape"          # https://github.com/kubescape/kubescape/
+  "marvin"             # https://github.com/undistro/marvin
+  "popeye"             # https://popeyecli.io/
+  "resource-capacity"  # https://github.com/robscott/kube-capacity
+  "view-cert"          # https://github.com/lmolas/kubectl-view-cert
+)
+
+readonly HELM_REPOS=(
   "appscode             https://charts.appscode.com/stable/"
   "aqua                 https://aquasecurity.github.io/helm-charts/"
   "argo                 https://argoproj.github.io/argo-helm"
@@ -63,67 +110,274 @@ HELM_REPOS=(
   "teleport             https://charts.releases.teleport.dev"
   "undistro             https://charts.undistro.io"
   "velero               https://vmware-tanzu.github.io/helm-charts"
-  )
+)
 
-# Install krew (https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
-if [ -d ~/.krew/bin/ ]; then
-  echo "krew already installed"
-else
-  cd "$(mktemp -d)" &&
-  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
-  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
-  KREW="krew-${OS}_${ARCH}" &&
-  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
-  tar zxvf "${KREW}.tar.gz" &&
-  ./"${KREW}" install krew
-fi
+# --- Runtime state ------------------------------------------------------------
 
-# Installing some plugins via krew
-source "$HOME"/.bashrc
-for plugin in "${KREW_PLUGINS[@]}"; do
-  if kubectl krew info "$plugin" >/dev/null 2>&1; then
-    echo "$plugin plugin, for kubectl, is already installed"
-  else
-    kubectl krew install "$plugin"
+SKIP_KREW=false
+SKIP_HELM=false
+SKIP_BINARIES=false
+DRY_RUN=false
+OS=""
+ARCH=""
+
+# --- Utility functions --------------------------------------------------------
+
+die() {
+  printf '%s: error: %s\n' "${SCRIPT_NAME}" "$1" >&2
+  exit "${2:-1}"
+}
+
+log_info() {
+  printf '[INFO]  %s\n' "$1"
+}
+
+log_warn() {
+  printf '[WARN]  %s\n' "$1" >&2
+}
+
+log_skip() {
+  printf '[SKIP]  %s\n' "$1"
+}
+
+# --- Dependency checks --------------------------------------------------------
+
+check_dependencies() {
+  local deps=("curl" "jq")
+  local missing=()
+
+  if [[ "${SKIP_KREW}" == false ]]; then
+    deps+=("kubectl")
   fi
-done
+  if [[ "${SKIP_HELM}" == false ]]; then
+    deps+=("helm")
+  fi
 
-# Installing Teleport client
-# if [[ "$(tsh version | awk '{printf $2; sub(/v/, "")}')" = "$TELEPORT_VERSION" ]]; then
-#   echo "Teleport client already installed"
-# else
-#   curl https://goteleport.com/static/install.sh | bash -s "$TELEPORT_VERSION"
-# fi
+  for dep in "${deps[@]}"; do
+    if ! command -v "${dep}" &>/dev/null; then
+      missing+=("${dep}")
+    fi
+  done
 
-# Installing some helm repositories
-for repo in "${HELM_REPOS[@]}"; do
-  helm repo add $repo
-done
-helm repo update
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    die "missing required commands: ${missing[*]}"
+  fi
+}
 
-# Installing Flux client
+# --- Detect platform ----------------------------------------------------------
 
+detect_platform() {
+  OS="$(uname | tr '[:upper:]' '[:lower:]')"
+  local machine
+  machine="$(uname -m)"
 
-# Installing hcl2json
-if [ "$(command -v hcl2json)" ]; then
-  echo "hcl2json already installed"
-else
-  DOWNLOAD_URL_HCL2JSON=$(curl -s https://api.github.com/repos/tmccombs/hcl2json/releases/latest \
-    | jq -r --arg name "hcl2json_linux_amd64" '.assets[] | select(.name == $name) | .browser_download_url')
-  curl -fsSL "$DOWNLOAD_URL_HCL2JSON" -o "$BIN_DIR/hcl2json"
-  chmod +x "$BIN_DIR"/hcl2json
-  ln -sf "$BIN_DIR"/hcl2json "$HOME"/.local/bin/hcl2json
-  echo "hcl2json instalado em $HOME/.local/bin/"
-fi
+  case "${machine}" in
+    x86_64)  ARCH="amd64" ;;
+    aarch64) ARCH="arm64" ;;
+    arm*)    ARCH="arm" ;;
+    *)       die "unsupported architecture: ${machine}" ;;
+  esac
 
-# Installing kubescape
-if [ "$(command -v kubescape)" ]; then
-  echo "kubescape already installed"
-else
-  DOWNLOAD_URL_KUBESCAPE=$(curl -s https://api.github.com/repos/kubescape/kubescape/releases/latest \
-    | jq -r --arg name "kubescape-ubuntu-latest" '.assets[] | select(.name == $name) | .browser_download_url')
-  curl -fsSL "$DOWNLOAD_URL_KUBESCAPE" -o "$BIN_DIR/kubescape"
-  chmod +x "$BIN_DIR"/kubescape
-  ln -sf "$BIN_DIR"/kubescape "$HOME"/.local/bin/kubescape
-  echo "kubescape instalado em $HOME/.local/bin/"
-fi
+  log_info "detected platform: ${OS}/${ARCH}"
+}
+
+# --- Usage --------------------------------------------------------------------
+
+usage() {
+  cat <<EOF
+Usage: ${SCRIPT_NAME} [options]
+
+Bootstrap Kubernetes development tooling.
+
+Options:
+  --skip-krew       Skip krew and plugin installation
+  --skip-helm       Skip helm repository setup
+  --skip-binaries   Skip binary downloads (hcl2json, kubescape)
+  --dry-run         Show what would be done without executing
+  -h, --help        Show this help message
+
+EOF
+}
+
+# --- Argument parsing ---------------------------------------------------------
+
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --skip-krew)     SKIP_KREW=true ;;
+      --skip-helm)     SKIP_HELM=true ;;
+      --skip-binaries) SKIP_BINARIES=true ;;
+      --dry-run)       DRY_RUN=true ;;
+      -h|--help)       usage; exit 0 ;;
+      --)              shift; break ;;
+      -*)              die "unknown option: $1 (use --help for usage)" ;;
+      *)               die "unexpected argument: $1 (use --help for usage)" ;;
+    esac
+    shift
+  done
+}
+
+# --- Krew setup ---------------------------------------------------------------
+
+install_krew() {
+  if [[ "${SKIP_KREW}" == true ]]; then
+    log_skip "krew installation (--skip-krew)"
+    return
+  fi
+
+  if [[ -d "${KREW_DIR}" ]]; then
+    log_info "krew already installed"
+  else
+    log_info "installing krew..."
+    if [[ "${DRY_RUN}" == true ]]; then
+      log_info "(dry-run) would install krew"
+      return
+    fi
+
+    local tmpdir
+    tmpdir="$(mktemp -d)"
+    local krew_file="krew-${OS}_${ARCH}"
+
+    curl -fsSL \
+      "https://github.com/kubernetes-sigs/krew/releases/latest/download/${krew_file}.tar.gz" \
+      -o "${tmpdir}/${krew_file}.tar.gz" \
+      || die "failed to download krew"
+
+    tar -xzf "${tmpdir}/${krew_file}.tar.gz" -C "${tmpdir}" \
+      || die "failed to extract krew"
+
+    "${tmpdir}/${krew_file}" install krew \
+      || die "failed to install krew"
+
+    rm -rf -- "${tmpdir}"
+  fi
+
+  # Ensure krew is in PATH for the rest of this script
+  export PATH="${KREW_DIR}:${PATH}"
+}
+
+install_krew_plugins() {
+  if [[ "${SKIP_KREW}" == true ]]; then
+    return
+  fi
+
+  log_info "installing krew plugins..."
+  for plugin in "${KREW_PLUGINS[@]}"; do
+    if kubectl krew list 2>/dev/null | grep -q "^${plugin}$"; then
+      log_info "krew plugin already installed: ${plugin}"
+    else
+      if [[ "${DRY_RUN}" == true ]]; then
+        log_info "(dry-run) would install krew plugin: ${plugin}"
+      else
+        log_info "installing krew plugin: ${plugin}"
+        kubectl krew install "${plugin}" || log_warn "failed to install plugin: ${plugin}"
+      fi
+    fi
+  done
+}
+
+# --- Helm setup ---------------------------------------------------------------
+
+setup_helm_repos() {
+  if [[ "${SKIP_HELM}" == true ]]; then
+    log_skip "helm repositories (--skip-helm)"
+    return
+  fi
+
+  log_info "adding helm repositories..."
+  for entry in "${HELM_REPOS[@]}"; do
+    local name url
+    read -r name url <<< "${entry}"
+
+    if [[ "${DRY_RUN}" == true ]]; then
+      log_info "(dry-run) would add helm repo: ${name} -> ${url}"
+    else
+      helm repo add "${name}" "${url}" 2>/dev/null \
+        || log_warn "failed to add helm repo: ${name}"
+    fi
+  done
+
+  if [[ "${DRY_RUN}" == false ]]; then
+    log_info "updating helm repositories..."
+    helm repo update || log_warn "helm repo update failed"
+  fi
+}
+
+# --- Binary downloads ---------------------------------------------------------
+
+download_github_binary() {
+  local name="$1"
+  local repo="$2"
+  local asset_name="$3"
+
+  if command -v "${name}" &>/dev/null; then
+    log_info "${name} already installed"
+    return
+  fi
+
+  if [[ "${DRY_RUN}" == true ]]; then
+    log_info "(dry-run) would download ${name} from ${repo}"
+    return
+  fi
+
+  log_info "downloading ${name}..."
+  local download_url
+  download_url=$(
+    curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
+      | jq -r --arg name "${asset_name}" \
+        '.assets[] | select(.name == $name) | .browser_download_url'
+  ) || die "failed to fetch release info for ${name}"
+
+  if [[ -z "${download_url}" ]]; then
+    die "could not find asset '${asset_name}' in ${repo} releases"
+  fi
+
+  curl -fsSL "${download_url}" -o "${BIN_DIR}/${name}" \
+    || die "failed to download ${name}"
+
+  chmod +x "${BIN_DIR}/${name}"
+  ln -sf "${BIN_DIR}/${name}" "${LINK_DIR}/${name}"
+
+  log_info "${name} installed to ${LINK_DIR}/${name}"
+}
+
+install_binaries() {
+  if [[ "${SKIP_BINARIES}" == true ]]; then
+    log_skip "binary downloads (--skip-binaries)"
+    return
+  fi
+
+  mkdir -p "${BIN_DIR}"
+
+  download_github_binary \
+    "hcl2json" \
+    "tmccombs/hcl2json" \
+    "hcl2json_${OS}_${ARCH}"
+
+  download_github_binary \
+    "kubescape" \
+    "kubescape/kubescape" \
+    "kubescape-${OS}-latest"
+}
+
+# --- Main ---------------------------------------------------------------------
+
+main() {
+  parse_args "$@"
+
+  if [[ "${DRY_RUN}" == true ]]; then
+    log_info "running in dry-run mode (no changes will be made)"
+  fi
+
+  check_dependencies
+  detect_platform
+
+  install_krew
+  install_krew_plugins
+  setup_helm_repos
+  install_binaries
+
+  log_info "k8s-setup complete"
+}
+
+main "$@"
