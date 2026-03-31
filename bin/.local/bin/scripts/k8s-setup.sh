@@ -64,6 +64,7 @@ readonly KREW_PLUGINS=(
   "ingress-nginx"      # https://kubernetes.github.io/ingress-nginx/kubectl-plugin/
   "kubescape"          # https://github.com/kubescape/kubescape/
   "marvin"             # https://github.com/undistro/marvin
+  "oidc-login"         # https://github.com/int128/kubelogin
   "popeye"             # https://popeyecli.io/
   "resource-capacity"  # https://github.com/robscott/kube-capacity
   "view-cert"          # https://github.com/lmolas/kubectl-view-cert
