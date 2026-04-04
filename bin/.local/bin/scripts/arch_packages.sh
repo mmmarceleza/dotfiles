@@ -209,8 +209,9 @@ ALL_SEGMENTS=(
 declare -A PACMAN_SEGMENTS=(
   ["base-cli"]="
     bash-completion bat btop chafa fd fzf glow jless jq lesspipe mediainfo
-    ncdu neovim nodejs npm pass python-pip ripgrep rsync sshfs starship
-    stow tailspin tldr tmux tree unzip wget yazi zellij zoxide
+    ncdu neovim nodejs npm pacman-contrib pass python-pip ripgrep rsync
+    sshfs starship stow tailspin tldr tmux tree unzip wget yazi zellij
+    zoxide
   "
   ["shell-tools"]="
     eza git-delta ipcalc kdiff3 lazygit ldns lsd meld openbsd-netcat rclone
