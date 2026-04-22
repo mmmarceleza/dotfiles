@@ -223,7 +223,8 @@ declare -A PACMAN_SEGMENTS=(
     tflint trivy vault
   "
   ["containers-virt"]="
-    buildah docker docker-compose podman qemu-full virt-manager
+    buildah cdrtools dnsmasq docker docker-compose podman qemu-full
+    virt-manager
   "
   ["network-security"]="
     mtr nmap openfortivpn tailscale whois wireguard-tools
