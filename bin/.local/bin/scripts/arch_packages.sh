@@ -259,7 +259,7 @@ declare -A PACMAN_SEGMENTS=(
 
 declare -A AUR_SEGMENTS=(
   ["devops-k8s"]="
-    aws-cli-bin grype-bin hadolint-bin kind-bin velero-bin
+    acli-bin aws-cli-bin grype-bin hadolint-bin kind-bin velero-bin
   "
   ["network-security"]="
     cloudflare-warp-bin
