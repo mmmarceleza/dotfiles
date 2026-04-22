@@ -220,7 +220,7 @@ declare -A PACMAN_SEGMENTS=(
   ["devops-k8s"]="
     actionlint argocd cloudflared cosign crane dive github-cli go go-yq helm
     k9s kubeconform kubectx kustomize mariadb-clients terraform terragrunt
-    trivy vault
+    tflint trivy vault
   "
   ["containers-virt"]="
     buildah docker docker-compose podman qemu-full virt-manager
