@@ -235,7 +235,7 @@ declare -A PACMAN_SEGMENTS=(
   "
   ["media-creative"]="
     audacity drawio-desktop inkscape kdenlive obs-studio vlc
-    vlc-plugin-ffmpeg vlc-plugin-x264
+    vlc-plugin-chromecast vlc-plugin-ffmpeg vlc-plugin-mdns vlc-plugin-x264
   "
   ["communication"]="
     telegram-desktop
