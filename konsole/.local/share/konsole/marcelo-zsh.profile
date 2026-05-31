@@ -1,16 +1,18 @@
 [Appearance]
 BorderWhenActive=true
 ColorScheme=marcelo-zsh
+DimmValue=100
 FocusBorderColor=0,0,0
 Font=JetBrainsMono Nerd Font,14,-1,5,50,0,0,0,0,0
-TabColor=24,25,29,0
+TabActivityColor=0,255,255
+TabColor=20,22,24,0
 
 [Cursor Options]
 CursorShape=0
 
 [General]
 Command=/home/marcelo/sync/git/mmmarceleza/github/dotfiles/bin/.local/bin/scripts/konsole-audit.sh
-DimWhenInactive=false
+DimWhenInactive=true
 InvertSelectionColors=false
 Name=marcelo-zsh
 Parent=FALLBACK/

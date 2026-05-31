@@ -20,5 +20,8 @@ Recent URLs[$e]=file:///tmp
 [SearchSettings]
 SearchRegExpression=true
 
+[TabBar]
+CloseTabButton=None
+
 [UiSettings]
 ColorScheme=
