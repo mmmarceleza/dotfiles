@@ -180,9 +180,6 @@ export EDITOR=${EDITOR:-$(command -v nvim || command -v vim || command -v vi)} 2
 # Enabling starship
 [ $(command -v starship) ] && eval "$(starship init zsh)" # https://starship.rs/
 
-# Enabling zoxide
-[ $(command -v zoxide) ] && eval "$(zoxide init zsh)" # https://github.com/ajeetdsouza/zoxide
-
 # autocompletion for kubectl
 compdef kubecolor=kubectl
 [ $(command -v kubectl) ] && source <(kubectl completion zsh) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
@@ -233,3 +230,7 @@ if [ -f '/home/marcelo/.local/bin/google-cloud-sdk/path.zsh.inc' ]; then . '/hom
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/marcelo/.local/bin/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/marcelo/.local/bin/google-cloud-sdk/completion.zsh.inc'; fi
+
+# Enabling zoxide (must be initialized LAST so its prompt hook is registered
+# after fzf/gcloud/etc., otherwise zoxide's doctor warns about hook ordering)
+[ $(command -v zoxide) ] && eval "$(zoxide init zsh)" # https://github.com/ajeetdsouza/zoxide
