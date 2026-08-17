@@ -78,6 +78,7 @@ cd dotfiles
 | bin       | User scripts and binaries            |
 | dolphin   | KDE Dolphin file manager             |
 | espanso   | Text expander                        |
+| gamemode  | Feral GameMode gaming optimisations  |
 | git       | Git configuration                    |
 | kanata    | Keyboard remapping                   |
 | konsole   | KDE Konsole terminal                 |

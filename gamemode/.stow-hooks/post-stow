@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+#
+# post-stow - reload GameMode after the config is symlinked
+#
+# Repository:  https://github.com/mmmarceleza/dotfiles
+# Author:      Marcelo Marques Melo
+#
+# --------------------------------------------------------------
+# gamemoded reads ~/.config/gamemode.ini at startup, so a freshly
+# stowed config only takes effect after the daemon restarts.
+#
+# The daemon is D-Bus activated: if it is not running, there is
+# nothing to do because the next game launch starts it and it
+# picks up the new file. If a game IS running, restarting would
+# drop the registered clients and leave the CPU governor applied
+# with nobody left to restore it, so the restart is skipped.
+#
+# Hook failures are non-fatal: stow.sh only prints a warning.
+# --------------------------------------------------------------
+# License: MIT
+# --------------------------------------------------------------
+
+set -euo pipefail
+
+YELLOW="\033[1;33m"
+GREEN="\033[0;32m"
+RESET="\033[0m"
+
+UNIT="gamemoded.service"
+
+# GameMode is Linux only and the unit is absent when it is not installed
+if ! command -v systemctl >/dev/null 2>&1; then
+  echo "  systemctl not found, skipping $UNIT reload."
+  exit 0
+fi
+
+if ! systemctl --user cat "$UNIT" >/dev/null 2>&1; then
+  echo "  $UNIT not installed, skipping reload."
+  exit 0
+fi
+
+# A running game holds the governor and the renice: never cut it off mid-session
+if command -v gamemoded >/dev/null 2>&1 && gamemoded -s 2>/dev/null | grep -q 'is active'; then
+  echo -e "  ${YELLOW}GameMode is active (a game is running). Skipping restart.${RESET}"
+  echo "  Run 'systemctl --user restart $UNIT' after closing the game."
+  exit 0
+fi
+
+if ! systemctl --user is-active --quiet "$UNIT"; then
+  echo "  $UNIT is idle, it will read the new config on the next game launch."
+  exit 0
+fi
+
+if systemctl --user restart "$UNIT"; then
+  echo -e "  ${GREEN}Restarted $UNIT to load the new config.${RESET}"
+else
+  echo -e "  ${YELLOW}Failed to restart $UNIT.${RESET}" >&2
+  exit 1
+fi
