@@ -2,6 +2,8 @@
 alias g='git'
 alias git-show-alias='cat $HOME/.gitconfig'
 alias lg='lazygit'
+alias oup='systemctl start ollama.service'
+alias odown='systemctl stop ollama.service'
 
 # applications
 alias n='nvim-qt'
