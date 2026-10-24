@@ -1,0 +1,253 @@
+#!/usr/bin/env bash
+#
+# display-mode - Switch between "TV only" and "work" (two monitors) layouts
+#
+# KDE Plasma (Wayland) only: uses kscreen-doctor for outputs and pactl for audio.
+#
+# Usage:
+#   display-mode tv      [--no-confirm] [--dry-run]   # TV only, monitors off, audio on TV
+#   display-mode work    [--dry-run]                  # Both monitors, TV off, audio on headset
+#   display-mode all     [--dry-run]                  # Everything on (troubleshooting)
+#   display-mode status                               # Show outputs and default sink
+#
+# In "tv" mode the script asks for confirmation on the TV through a desktop
+# notification. If nobody clicks "Keep" within CONFIRM_SECONDS, it rolls back
+# to "work", so a TV that is off or on the wrong input never leaves you blind.
+#
+# Overridable via environment variables:
+#   MAIN_MONITOR, SIDE_MONITOR, TV_OUTPUT        connector names
+#   MAIN_MODE, SIDE_MODE                         e.g. 2560x1440@165
+#   TV_MODE                                      force a mode, e.g. 1920x1080@60
+#   TV_SCALE                                     force a scale, e.g. 1.5
+#   TV_SINK, WORK_SINK                           PipeWire sink names (TV_SINK is auto-detected)
+#   HDMI_CARD                                    PipeWire card of the GPU HDMI audio
+#   CONFIRM_SECONDS                              rollback timeout (default 20)
+
+set -euo pipefail
+
+MAIN_MONITOR="${MAIN_MONITOR:-DP-3}"   # LG UltraGear 1440p
+SIDE_MONITOR="${SIDE_MONITOR:-DP-2}"   # HKM 1080p
+TV_OUTPUT="${TV_OUTPUT:-HDMI-A-1}"     # TCL 55C6K
+MAIN_MODE="${MAIN_MODE:-2560x1440@165}"
+SIDE_MODE="${SIDE_MODE:-1920x1080@165}"
+HDMI_CARD="${HDMI_CARD:-alsa_card.pci-0000_07_00.1}"   # NVIDIA HDMI audio
+WORK_SINK="${WORK_SINK:-alsa_output.usb-XiiSound_Technology_Corporation_Fuxi-H3-00.pro-output-0}"
+CONFIRM_SECONDS="${CONFIRM_SECONDS:-20}"
+
+DRY_RUN=false
+CONFIRM=true
+
+log() { echo "[display-mode] $*"; }
+die() { echo "[display-mode] ERROR: $*" >&2; exit 1; }
+
+run() {
+    if $DRY_RUN; then
+        echo "  (dry-run) $*"
+    else
+        "$@"
+    fi
+}
+
+require_tools() {
+    local tool
+    for tool in kscreen-doctor jq pactl; do
+        command -v "$tool" >/dev/null || die "'$tool' not found in PATH"
+    done
+}
+
+outputs_json() {
+    kscreen-doctor -j
+}
+
+is_connected() {
+    local output="$1"
+    outputs_json | jq -e --arg n "$output" '.outputs[] | select(.name == $n and .connected)' >/dev/null
+}
+
+# Pick the best TV mode: 3840x2160 at >= 59 Hz (highest refresh wins),
+# otherwise 1920x1080 at the highest refresh. Never 4K@30 (bad for desktop/games).
+pick_tv_mode() {
+    if [[ -n "${TV_MODE:-}" ]]; then
+        echo "$TV_MODE"
+        return
+    fi
+    outputs_json | jq -r --arg n "$TV_OUTPUT" '
+        [.outputs[] | select(.name == $n) | .modes[]] as $modes
+        | ([$modes[] | select(.size.width == 3840 and .size.height == 2160 and .refreshRate >= 59)]
+           | sort_by(.refreshRate) | last) //
+          ([$modes[] | select(.size.width == 1920 and .size.height == 1080)]
+           | sort_by(.refreshRate) | last)
+        | .name // empty'
+}
+
+# Scale tuned for couch distance on a 55" panel: 4K at 2x gives a 1080p-sized UI.
+pick_tv_scale() {
+    local mode="$1"
+    if [[ -n "${TV_SCALE:-}" ]]; then
+        echo "$TV_SCALE"
+    elif [[ "$mode" == 3840x2160@* ]]; then
+        echo 2
+    else
+        echo 1
+    fi
+}
+
+# The NVIDIA HDMI audio ports are assigned dynamically, so the TV's sink name
+# changes (hdmi-stereo, hdmi-stereo-extra1, ...). With the monitors disabled the
+# TV is the only HDMI port marked available, so wait for that and select it.
+set_tv_audio() {
+    if [[ -n "${TV_SINK:-}" ]]; then
+        set_audio "$TV_SINK"
+        return
+    fi
+    if $DRY_RUN; then
+        echo "  (dry-run) select the only available hdmi-stereo* profile on $HDMI_CARD"
+        return
+    fi
+
+    local profiles attempt
+    for attempt in $(seq 1 20); do
+        profiles=$(pactl list cards | sed -n "/Name: $HDMI_CARD\$/,/Name: alsa_card/p" \
+            | grep -oE 'output:hdmi-stereo(-extra[0-9]+)?: .*available: yes' \
+            | cut -d: -f1-2)
+        if [[ $(wc -l <<<"$profiles") -eq 1 && -n "$profiles" ]]; then
+            run pactl set-card-profile "$HDMI_CARD" "$profiles"
+            set_audio "${HDMI_CARD/alsa_card/alsa_output}.${profiles#output:}"
+            return
+        fi
+        sleep 0.5
+    done
+    log "Could not find a single available HDMI audio port for the TV (got: ${profiles:-none}), leaving audio unchanged"
+}
+
+set_audio() {
+    local sink="$1" input
+    if ! pactl list short sinks | awk '{print $2}' | grep -qx "$sink"; then
+        log "Audio sink '$sink' not found, leaving audio unchanged"
+        return 0
+    fi
+    run pactl set-default-sink "$sink"
+    # Move streams that are already playing, so they follow the new default
+    for input in $(pactl list short sink-inputs | awk '{print $1}'); do
+        run pactl move-sink-input "$input" "$sink" || log "Could not move stream $input"
+    done
+    log "Audio -> $sink"
+}
+
+mode_work() {
+    is_connected "$MAIN_MONITOR" || die "$MAIN_MONITOR is not connected"
+    log "Switching to WORK: $MAIN_MONITOR + $SIDE_MONITOR, $TV_OUTPUT off"
+
+    local args=(
+        "output.$MAIN_MONITOR.enable"
+        "output.$MAIN_MONITOR.mode.$MAIN_MODE"
+        "output.$MAIN_MONITOR.position.0,0"
+        "output.$MAIN_MONITOR.scale.1"
+        "output.$MAIN_MONITOR.priority.1"
+    )
+    if is_connected "$SIDE_MONITOR"; then
+        args+=(
+            "output.$SIDE_MONITOR.enable"
+            "output.$SIDE_MONITOR.mode.$SIDE_MODE"
+            "output.$SIDE_MONITOR.position.2560,0"
+            "output.$SIDE_MONITOR.scale.1"
+            "output.$SIDE_MONITOR.priority.2"
+        )
+    else
+        log "$SIDE_MONITOR not connected, skipping it"
+    fi
+    # Disable the TV last, after the monitors are guaranteed to be on
+    if is_connected "$TV_OUTPUT"; then
+        args+=("output.$TV_OUTPUT.disable")
+    fi
+
+    run kscreen-doctor "${args[@]}"
+    set_audio "$WORK_SINK"
+}
+
+confirm_on_tv() {
+    local answer
+    answer=$(notify-send --app-name="display-mode" --urgency=critical \
+        --expire-time=$((CONFIRM_SECONDS * 1000)) \
+        --action=keep="Keep TV mode" \
+        "TV mode" "Click 'Keep' within ${CONFIRM_SECONDS}s or the monitors come back." \
+        2>/dev/null) || true
+    [[ "$answer" == "keep" ]]
+}
+
+mode_tv() {
+    is_connected "$TV_OUTPUT" || die "$TV_OUTPUT is not connected (is the TV on?)"
+
+    local tv_mode tv_scale
+    tv_mode=$(pick_tv_mode)
+    [[ -n "$tv_mode" ]] || die "No usable mode found for $TV_OUTPUT"
+    tv_scale=$(pick_tv_scale "$tv_mode")
+    log "Switching to TV: $TV_OUTPUT $tv_mode (scale $tv_scale), monitors off"
+
+    # Enable the TV first: KWin refuses a config with zero enabled outputs
+    run kscreen-doctor \
+        "output.$TV_OUTPUT.enable" \
+        "output.$TV_OUTPUT.mode.$tv_mode" \
+        "output.$TV_OUTPUT.position.0,0" \
+        "output.$TV_OUTPUT.scale.$tv_scale" \
+        "output.$TV_OUTPUT.priority.1" \
+        "output.$MAIN_MONITOR.disable" \
+        "output.$SIDE_MONITOR.disable"
+    set_tv_audio
+
+    if $DRY_RUN || ! $CONFIRM; then
+        return 0
+    fi
+    if confirm_on_tv; then
+        log "TV mode confirmed"
+    else
+        log "No confirmation within ${CONFIRM_SECONDS}s, rolling back"
+        mode_work
+    fi
+}
+
+mode_all() {
+    log "Enabling all outputs: $MAIN_MONITOR | $SIDE_MONITOR | $TV_OUTPUT (left to right)"
+    # Explicit positions: otherwise the TV keeps the 0,0 from TV mode and overlaps the main monitor
+    run kscreen-doctor \
+        "output.$MAIN_MONITOR.enable" "output.$MAIN_MONITOR.mode.$MAIN_MODE" \
+        "output.$MAIN_MONITOR.position.0,0" "output.$MAIN_MONITOR.priority.1" \
+        "output.$SIDE_MONITOR.enable" "output.$SIDE_MONITOR.mode.$SIDE_MODE" \
+        "output.$SIDE_MONITOR.position.2560,0" "output.$SIDE_MONITOR.priority.2" \
+        "output.$TV_OUTPUT.enable" "output.$TV_OUTPUT.position.4480,0" \
+        "output.$TV_OUTPUT.priority.3"
+}
+
+mode_status() {
+    outputs_json | jq -r '.outputs[] | select(.connected)
+        | . as $o
+        | "\(.name)\t\(if .enabled then "on " else "off" end)\tpriority=\(.priority)\tscale=\(.scale)\tmode=\(
+            ($o.modes[] | select(.id == $o.currentModeId) | .name) // "-")"'
+    echo "default sink: $(pactl get-default-sink)"
+}
+
+main() {
+    local action="${1:-}"
+    [[ -n "$action" ]] || die "usage: display-mode {tv|work|all|status} [--no-confirm] [--dry-run]"
+    shift
+
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run) DRY_RUN=true ;;
+            --no-confirm) CONFIRM=false ;;
+            *) die "unknown option: $arg" ;;
+        esac
+    done
+
+    require_tools
+    case "$action" in
+        tv) mode_tv ;;
+        work) mode_work ;;
+        all) mode_all ;;
+        status) mode_status ;;
+        *) die "unknown mode '$action' (expected tv, work, all or status)" ;;
+    esac
+}
+
+main "$@"
